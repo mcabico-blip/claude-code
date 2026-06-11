@@ -37,8 +37,15 @@ export function TrendChart({ data, project, unit }: { data: TrendPoint[]; projec
         <text x={px - 6} y={py + 3} textAnchor="end" fontSize="9" fill="#5b6b7a">{Math.round(max)}</text>
         {lastActualIdx >= 0 && (
           <>
-            <line x1={x(lastActualIdx)} y1={py} x2={x(lastActualIdx)} y2={py + plotH} stroke="#b9c6d1" strokeDasharray="3 3" />
-            <text x={x(lastActualIdx)} y={py - 4} textAnchor="middle" fontSize="8" fill="#5b6b7a" fontFamily="ui-monospace,monospace">
+            <line x1={x(lastActualIdx)} y1={py - 2} x2={x(lastActualIdx)} y2={py + plotH} stroke="#23476b" strokeDasharray="3 3" />
+            {/* survey flag marks the station we've reached */}
+            <path
+              d={`M${x(lastActualIdx)},${py - 2} l0,-9 l12,3.5 l-12,3.5`}
+              fill="#c2410c"
+              stroke="#102536"
+              strokeWidth="0.8"
+            />
+            <text x={x(lastActualIdx) + 15} y={py - 4} fontSize="7.5" fill="#5b6b7a" fontFamily="'IBM Plex Mono',monospace" letterSpacing="1">
               TODAY
             </text>
           </>

@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import type { AskAnswer } from '@ubi/types';
 import { api, getUser } from '../api';
+import { SheetBar } from '../ui';
 
 interface Turn {
   who: 'me' | 'ai';
@@ -36,12 +37,7 @@ export default function Ask() {
 
   return (
     <>
-      <div className="top">
-        <h1>Ask AI</h1>
-        <div className="right">
-          <span className="st st-info">scope: {user?.claims.join(' · ')} · clinic aggregate-only</span>
-        </div>
-      </div>
+      <SheetBar sheet="ASK-03" title="Ask AI — conversational query" note={`Scope: ${user?.claims.join(' · ')} · clinic aggregate-only`} />
       <div className="chat mb">
         {turns.length === 0 && (
           <div className="muted">

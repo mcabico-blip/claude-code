@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { ManComSnapshot } from '@ubi/types';
 import { api } from '../api';
 import { BarsChart, Sparkline, TrendChart } from '../charts';
+import { Chainage, SheetBar } from '../ui';
 
 const peso = (centavos: number) => `₱${(centavos / 100 / 1_000_000).toFixed(1)}M`;
 
@@ -28,12 +29,12 @@ export default function ManCom() {
 
   return (
     <>
+      <SheetBar sheet="MC-01" title="ManCom — Management Committee" note="Consolidated from every department via Pillar-3 read-models" />
       <div className="top">
-        <h1>ManCom</h1>
+        <span className={`toggle${project ? ' on' : ''}`} onClick={toggle} role="switch" aria-checked={project}>
+          <span className="tg" /> Project trends forward
+        </span>
         <div className="right">
-          <span className={`toggle${project ? ' on' : ''}`} onClick={toggle} role="switch" aria-checked={project}>
-            <span className="tg" /> Project trends forward
-          </span>
           <span className="asof">
             <i /> live · as of {new Date(snap.asOf).toLocaleTimeString()}
           </span>
@@ -43,23 +44,24 @@ export default function ManCom() {
       <div className="mancom">
         <div>
           <div className="kpis">
-            <div className="card kpi">
+            <div className="kpi">
               <div className="lab">Active projects</div>
               <div className="val">
                 {k.activeProjects} <span className="mchip mc-bad">{k.flaggedProjects} ⚑</span>
               </div>
               <div className="sub">DPWH packages · flags pre-vetted by Operations</div>
             </div>
-            <div className="card kpi">
+            <div className="kpi">
               <div className="lab">Billings — month</div>
               <div className="val">
                 {peso(k.billingsMonthCentavos)} <span className="d-up">▲ {k.billingsDeltaPct}%</span>
               </div>
-              <div className="sub">
-                {k.billingDraftsSubmitted} of {k.billingDraftsTotal} monthly drafts submitted
-              </div>
+              <Chainage
+                pct={(k.billingDraftsSubmitted / k.billingDraftsTotal) * 100}
+                label={`${k.billingDraftsSubmitted}/${k.billingDraftsTotal} drafts`}
+              />
             </div>
-            <div className="card kpi">
+            <div className="kpi">
               <div className="lab">Avg slippage</div>
               <div className="val">
                 {k.avgSlippagePct}%
@@ -69,7 +71,7 @@ export default function ManCom() {
               </div>
               <div className="sub">across active packages</div>
             </div>
-            <div className="card kpi">
+            <div className="kpi">
               <div className="lab">Open exceptions</div>
               <div className="val">
                 {k.openExceptions} <span className="mchip mc-bad">{k.escalatedExceptions} escalated</span>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { MaterialsSchedule, PayItem, Project } from '@ubi/types';
 import { api, getUser, hasClaim } from '../api';
+import { SheetBar } from '../ui';
 
 export default function Engineering() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -41,9 +42,7 @@ export default function Engineering() {
 
   return (
     <>
-      <div className="top"><h1>Engineering</h1>
-        <div className="right"><span className="src">SRC · engineering.projects / swa</span></div>
-      </div>
+      <SheetBar sheet="ENG-06" title="Engineering — projects · pay items · schedules" note="AI pre-fills the weekly schedule; PE adjusts → PM → VPO → Procurement" />
       {error && <div className="err">{error}</div>}
 
       <div className="grid2">

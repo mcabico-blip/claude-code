@@ -32,33 +32,42 @@ export default function Login() {
   return (
     <div className="loginwrap">
       <div className="login">
-        <div className="brand">
-          <div className="slogo">U</div>
-          <div>
-            <h1>UBI Construction Suite</h1>
-            <div className="sub">Ulticon Builders · Omega Asia</div>
+        <div className="fieldcopy">FIELD COPY<br />REV A</div>
+        <div className="sheet">
+          <div className="brand">
+            <div className="slogo">U</div>
+            <div>
+              <h1>UBI Construction Suite</h1>
+              <div className="sub">Ulticon Builders · Omega Asia</div>
+            </div>
+          </div>
+          {error && <div className="err">{error}</div>}
+          <form onSubmit={submit}>
+            <label className="field">
+              <span>Email</span>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus required />
+            </label>
+            <label className="field">
+              <span>Password</span>
+              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            </label>
+            <button className="btn navy" style={{ width: '100%' }} disabled={busy}>
+              {busy ? 'Signing in…' : 'Sign in'}
+            </button>
+            <button type="button" className="btn" style={{ width: '100%', marginTop: 10 }} title="Optional Workspace sign-in lands in pillar-auth follow-up" disabled>
+              Continue with Google — soon
+            </button>
+          </form>
+          <div className="titleblock">
+            <div>Sheet<b>LOGIN-01</b></div>
+            <div>Drawn by<b>UBI / IT</b></div>
+            <div>Scale<b>NTS</b></div>
+            <div>Rev<b>A</b></div>
           </div>
         </div>
-        {error && <div className="err">{error}</div>}
-        <form onSubmit={submit} className="card">
-          <label className="field">
-            <span>Email</span>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoFocus required />
-          </label>
-          <label className="field">
-            <span>Password</span>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          </label>
-          <button className="btn navy" style={{ width: '100%' }} disabled={busy}>
-            {busy ? 'Signing in…' : 'Sign in'}
-          </button>
-          <button type="button" className="btn" style={{ width: '100%', marginTop: 8 }} title="Optional Workspace sign-in lands in pillar-auth follow-up" disabled>
-            Continue with Google — soon
-          </button>
-        </form>
         <div className="hint">
           <b>Offline-ready:</b> after the first online sign-in this device keeps a secure session for field
-          use. Demo logins: <code>ceo@ubi.ph/ceo123</code> · <code>vpo@ubi.ph/vpo123</code> ·{' '}
+          use. Demo: <code>ceo@ubi.ph/ceo123</code> · <code>vpo@ubi.ph/vpo123</code> ·{' '}
           <code>pm@ubi.ph/pm123</code> · <code>pe@ubi.ph/pe123</code>
         </div>
       </div>

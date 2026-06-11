@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
+import { SheetBar } from '../ui';
 
 /** Breadth-first department pages: render the module's read surface as-is.
  *  Deep workflows land per module branch (see CLAUDE.md §11). */
@@ -57,9 +58,7 @@ export default function Dept() {
 
   return (
     <>
-      <div className="top"><h1>{meta.title}</h1>
-        <div className="right"><span className="src">SRC · {meta.src}</span></div>
-      </div>
+      <SheetBar sheet={`${slug.slice(0, 3).toUpperCase()}-RM`} title={meta.title} note={`Read surface · ${meta.src} · deep workflows land on the ${slug} branch`} />
       {error && <div className="err">{error}</div>}
       {!error && data == null && <div className="muted">Loading…</div>}
       {Array.isArray(data) && <div className="card"><AutoTable rows={data as Array<Record<string, unknown>>} /></div>}

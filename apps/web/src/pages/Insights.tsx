@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Insight } from '@ubi/types';
 import { api } from '../api';
+import { SheetBar, Stamp } from '../ui';
 
 export default function Insights() {
   const [items, setItems] = useState<Insight[] | null>(null);
@@ -18,12 +19,7 @@ export default function Insights() {
 
   return (
     <>
-      <div className="top">
-        <h1>AI Insights</h1>
-        <div className="right">
-          <span className="asof"><i /> generated off-box · posted via /api/ai/insights</span>
-        </div>
-      </div>
+      <SheetBar sheet="AI-02" title="AI Insights — auto-surfaced register" note="Generated off-box · posted back via /api/ai/insights" />
       <div className="spread mb">
         {(['all', 'critical', 'warning', 'positive'] as const).map((f) => (
           <button key={f} className={`btn sm${filter === f ? ' navy' : ''}`} onClick={() => setFilter(f)}>
@@ -34,10 +30,10 @@ export default function Insights() {
       {shown.map((ins) => (
         <div key={ins.id} className={`ins ${ins.severity} mb`} style={{ borderLeftWidth: 5 }}>
           <div className="spread">
-            <span className={`st ${ins.severity === 'critical' ? 'st-bad' : ins.severity === 'warning' ? 'st-warn' : 'st-ok'}`}>
-              {ins.severity.toUpperCase()}
-            </span>
-            <b style={{ fontSize: 14 }}>{ins.title}</b>
+            <Stamp kind={ins.severity === 'critical' ? 'bad' : ins.severity === 'warning' ? 'warn' : 'ok'}>
+              {ins.severity}
+            </Stamp>
+            <b style={{ fontSize: 15 }}>{ins.title}</b>
           </div>
           <p style={{ maxWidth: 700, fontSize: 13 }}>{ins.body}</p>
           <div className="evi" style={{ marginBottom: 8 }}>

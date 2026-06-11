@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import type { TrackedDocument, WhereIsAnswer } from '@ubi/types';
 import { api } from '../api';
+import { SheetBar } from '../ui';
 
 export default function Docs() {
   const [docs, setDocs] = useState<TrackedDocument[]>([]);
@@ -44,9 +45,7 @@ export default function Docs() {
 
   return (
     <>
-      <div className="top"><h1>Document Tracking</h1>
-        <div className="right"><span className="src">PILLAR 2 · BACKBONE</span></div>
-      </div>
+      <SheetBar sheet="DOC-04" title="Document Tracking — transmittal registry" note="Pillar 2 backbone · scan to transmit / scan to receive" />
 
       <form className="askrow mb" onSubmit={submit}>
         <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Where is… (scan or type a code, e.g. DOC-2026-00001)" />
