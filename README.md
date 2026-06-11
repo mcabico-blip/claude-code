@@ -23,8 +23,24 @@ covering everything outside the Acumatica ERP. This repo currently holds the
 `<module>_<submodule>_<featurename>`.
 
 ## Status
-Pre-code. Next: monorepo scaffold (API + PWA + Postgres + StorageProvider +
-the three pillars stubbed), built on the module branches per the phasing.
+Breadth-first build is live: monorepo (NestJS API + React PWA + Postgres +
+StorageProvider), the three pillars working (auth/RBAC, doc tracking,
+AI-queryable read-model registry), shared engines (approvals, ticketing,
+notifications, expiry), Engineering core (pay-item library, AI-prefilled
+weekly materials schedule → PM → VPO chain), CEO ManCom dashboard wired
+end-to-end, and read-surface stubs for every other department. Refinement
+happens per module branch.
+
+## Run locally
+```bash
+cp .env.example .env        # endpoints externalized — hard rule 6
+docker compose -f docker-compose.dev.yml up -d   # postgres + redis (or use your own)
+npm install
+npm run dev:api             # NestJS on :3000 (seeds demo data on first boot)
+npm run dev:web             # Vite PWA on :5173 (proxies /api)
+```
+Demo logins: `ceo@ubi.ph/ceo123` · `vpo@ubi.ph/vpo123` · `pm@ubi.ph/pm123`
+· `pe@ubi.ph/pe123` · `admin@ubi.ph/admin123`.
 
 ## Open items to confirm
 - Cement-delivery **receiver role**.
