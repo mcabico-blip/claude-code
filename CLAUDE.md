@@ -8,6 +8,55 @@
 
 ---
 
+## 0. CURRENT BUILD STATE — START HERE (updated 2026-06-12)
+
+> **For Claude Code sessions:** the suite is **no longer pre-code**. A working
+> breadth-first build lives on branch **`kickoff-build`** (PR #1 → `main`).
+> If you cloned `main` and see only docs, run `git checkout kickoff-build`
+> first. A deployment is live at `edge.ubi-as.com`.
+
+**What exists and runs**
+- Monorepo: `apps/api` (NestJS), `apps/web` (React+Vite PWA),
+  `packages/types`, `packages/storage`.
+- **Pillars working:** auth (JWT + claims RBAC + entity scope, field-role
+  grace), doc tracking (QR codes, scan transmit/receive, where-is + history),
+  AI layer (read-model registry — 15 surfaces, `/api/ai/ask`, off-box insight
+  postback at `/api/ai/insights`).
+- **Shared engines:** approvals (PE→PM→VPO chains), ticketing (IT+Admin),
+  notifications, expiry reminders, RBAC-gated `/api/files/:id` over
+  `StorageProvider` (LocalDisk).
+- **Modules:** Engineering core (projects, DPWH pay-item library, AI-prefilled
+  weekly materials schedule → approvals), Procurement DR capture, Operations
+  control tower, CEO ManCom consolidation (`/api/ceo/mancom`); every other
+  department exposes a read-surface stub registered in the AI layer.
+- **Web:** "drawing comes alive" design system (title-block headers, stamps,
+  chainage rulers — `mockups.html` is the approved reference). Pages: login,
+  ManCom, AI Insights, Ask AI, Documents, Approvals, Engineering,
+  per-department read surfaces.
+
+**Run locally** — see README. Short: `cp .env.example .env` → Postgres+Redis
+up → `npm install` → `npm run dev:api` (:3000; seeds demo data only when
+`SEED_DEMO=true` and DB is empty) → `npm run dev:web` (:5173).
+
+**Production env (edge.ubi-as.com):** `JWT_SECRET` is **required** (boot
+fails on the dev default), `SEED_DEMO` must be unset/false, set
+`CORS_ORIGIN=https://edge.ubi-as.com`. If the live DB was seeded with demo
+users, **rotate or disable them immediately** — the demo passwords are
+printed in this repo.
+
+**Next work, in order**
+1. Finish production hardening: TypeORM migrations to replace `DB_SYNC`,
+   helmet, nginx/systemd/deploy docs, Postgres + uploads backups.
+2. Real SWA/billing tables behind `engineering.swa`; field photo capture
+   pipeline (GPS + timestamp + <500 KB compress + offline queue); Google
+   OAuth; offline cached login.
+3. Deep module work on its own branch per §11 (`survey`, `mqc`, `it`, …),
+   keeping each module's Pillar-3 read model as the contract.
+
+Micro-commits, conventional scopes per §11.
+
+---
+
 ## 1. What this is
 
 A **full construction management suite for Ulticon Builders, Inc. (UBI)** that
