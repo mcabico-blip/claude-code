@@ -13,9 +13,14 @@ import { UserEntity } from './user.entity';
     JwtModule.registerAsync({
       global: true,
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET', 'dev-only-secret'),
-      }),
+      useFactory: (config: ConfigService) => {
+        const secret = config.get<string>('JWT_SECRET');
+        const isDevDefault = !secret || secret === 'change-me' || secret === 'dev-only-secret';
+        if (process.env.NODE_ENV === 'production' && isDevDefault) {
+          throw new Error('JWT_SECRET must be set to a strong value in production');
+        }
+        return { secret: secret ?? 'dev-only-secret' };
+      },
     }),
   ],
   controllers: [AuthController],

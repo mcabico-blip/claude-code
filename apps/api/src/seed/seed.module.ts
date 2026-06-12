@@ -1,4 +1,5 @@
 import { Injectable, Logger, Module, OnApplicationBootstrap } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { UserClaims } from '@ubi/types';
 import { Repository } from 'typeorm';
@@ -16,6 +17,7 @@ export class SeedService implements OnApplicationBootstrap {
   private readonly log = new Logger('Seed');
 
   constructor(
+    private readonly config: ConfigService,
     private readonly auth: AuthService,
     private readonly docs: DocTrackingService,
     private readonly expiry: ExpiryService,
@@ -25,6 +27,11 @@ export class SeedService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
+    // Demo data carries PUBLIC passwords — never allowed to reach production.
+    if (this.config.get('SEED_DEMO') !== 'true') {
+      this.log.log('SEED_DEMO != true — skipping demo seed');
+      return;
+    }
     if ((await this.payItems.count()) > 0) return;
     this.log.log('empty database — seeding demo data');
 
