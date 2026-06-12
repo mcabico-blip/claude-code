@@ -6,6 +6,7 @@ import Ask from './pages/Ask';
 import Dept from './pages/Dept';
 import Docs from './pages/Docs';
 import Engineering from './pages/Engineering';
+import Helpdesk from './pages/Helpdesk';
 import Insights from './pages/Insights';
 import Login from './pages/Login';
 import ManCom from './pages/ManCom';
@@ -20,6 +21,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/helpdesk" element={<Helpdesk />} />
       <Route element={<RequireAuth><Shell /></RequireAuth>}>
         <Route path="/" element={<Navigate to={home} replace />} />
         <Route path="/mancom" element={<ManCom />} />

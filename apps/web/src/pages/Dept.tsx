@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api';
-import { SheetBar } from '../ui';
+import { Loader, SheetBar } from '../ui';
 
 /** Breadth-first department pages: render the module's read surface as-is.
  *  Deep workflows land per module branch (see CLAUDE.md §11). */
@@ -46,12 +46,17 @@ export default function Dept() {
   const { slug = '' } = useParams();
   const meta = endpoints[slug];
   const [data, setData] = useState<unknown>(null);
+  const [tickets, setTickets] = useState<Array<Record<string, unknown>> | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setData(null);
+    setTickets(null);
     setError(null);
     if (meta) api<unknown>(meta.path).then(setData).catch((e: Error) => setError(e.message));
+    if (slug === 'it') {
+      api<Array<Record<string, unknown>>>('/tickets?source=it').then(setTickets).catch(() => {});
+    }
   }, [slug]);
 
   if (!meta) return <div className="err">Unknown department: {slug}</div>;
@@ -60,7 +65,7 @@ export default function Dept() {
     <>
       <SheetBar sheet={`${slug.slice(0, 3).toUpperCase()}-RM`} title={meta.title} note={`Read surface · ${meta.src} · deep workflows land on the ${slug} branch`} />
       {error && <div className="err">{error}</div>}
-      {!error && data == null && <div className="muted">Loading…</div>}
+      {!error && data == null && <Loader label={`Querying ${meta.src}`} />}
       {Array.isArray(data) && <div className="card"><AutoTable rows={data as Array<Record<string, unknown>>} /></div>}
       {!Array.isArray(data) && data != null && typeof data === 'object' && (
         <div className="card">
@@ -74,6 +79,15 @@ export default function Dept() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {slug === 'it' && tickets && (
+        <div className="card" style={{ marginTop: 14 }}>
+          <div className="ph">
+            <b>Helpdesk queue</b>
+            <span className="src">SRC · ticketing (it) · public form feeds this</span>
+          </div>
+          <AutoTable rows={tickets} />
         </div>
       )}
     </>

@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { UserClaims } from '@ubi/types';
 import { api, setSession } from '../api';
 
@@ -69,6 +69,9 @@ export default function Login() {
           <b>Offline-ready:</b> after the first online sign-in this device keeps a secure session for field
           use. Demo: <code>ceo@ubi.ph/ceo123</code> · <code>vpo@ubi.ph/vpo123</code> ·{' '}
           <code>pm@ubi.ph/pm123</code> · <code>pe@ubi.ph/pe123</code>
+          <div style={{ marginTop: 7 }}>
+            IT problem, no account? <Link to="/helpdesk">File a helpdesk ticket — no sign-in needed →</Link>
+          </div>
         </div>
       </div>
     </div>
