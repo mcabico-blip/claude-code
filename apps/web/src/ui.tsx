@@ -1,4 +1,50 @@
+import { useEffect, useRef, useState } from 'react';
+
 /** Signature components of the "drawing comes alive" design language. */
+
+/** Typewriter reveal for AI responses — pen-on-paper, not a text dump. */
+export function Type({ text, speed = 12, onDone }: { text: string; speed?: number; onDone?: () => void }) {
+  const [n, setN] = useState(0);
+  const doneRef = useRef(onDone);
+  doneRef.current = onDone;
+
+  useEffect(() => {
+    setN(0);
+    const id = setInterval(() => {
+      setN((prev) => {
+        const next = Math.min(prev + 2, text.length);
+        if (next >= text.length) {
+          clearInterval(id);
+          doneRef.current?.();
+        }
+        return next;
+      });
+    }, speed);
+    return () => clearInterval(id);
+  }, [text, speed]);
+
+  return (
+    <>
+      {text.slice(0, n)}
+      {n < text.length && <span className="caret">▌</span>}
+    </>
+  );
+}
+
+/** Loading state drawn as hatched placeholder linework on a sheet. */
+export function Loader({ label = 'Pulling read-models' }: { label?: string }) {
+  return (
+    <div className="card loader" role="status" aria-live="polite">
+      <div className="hatch" style={{ width: '62%' }} />
+      <div className="hatch" style={{ width: '88%' }} />
+      <div className="hatch" style={{ width: '74%' }} />
+      <div className="hatch" style={{ width: '41%' }} />
+      <span className="loader-label">
+        {label}<span className="dots"><i>.</i><i>.</i><i>.</i></span>
+      </span>
+    </div>
+  );
+}
 
 /** Rubber-stamp status — rotated, double-ruled, ink-textured. */
 export function Stamp({ kind, children }: { kind: 'ok' | 'warn' | 'bad' | 'info'; children: string }) {

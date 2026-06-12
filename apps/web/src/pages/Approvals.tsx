@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api';
-import { SheetBar, Stamp } from '../ui';
+import { Loader, SheetBar, Stamp } from '../ui';
 
 interface ApprovalRow {
   id: string;
@@ -26,7 +26,7 @@ export default function Approvals() {
   }
 
   if (error) return <div className="err">{error}</div>;
-  if (!rows) return <div className="muted">Loading approvals…</div>;
+  if (!rows) return <Loader label="Loading approval chains" />;
 
   return (
     <>

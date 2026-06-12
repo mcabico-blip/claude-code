@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Insight } from '@ubi/types';
 import { api } from '../api';
-import { SheetBar, Stamp } from '../ui';
+import { Loader, SheetBar, Stamp } from '../ui';
 
 export default function Insights() {
   const [items, setItems] = useState<Insight[] | null>(null);
@@ -13,7 +13,7 @@ export default function Insights() {
   }, []);
 
   if (error) return <div className="err">{error}</div>;
-  if (!items) return <div className="muted">Loading insights…</div>;
+  if (!items) return <Loader label="Loading insight register" />;
   const shown = items.filter((i) => filter === 'all' || i.severity === filter);
   const counts = (sev: string) => items.filter((i) => i.severity === sev).length;
 

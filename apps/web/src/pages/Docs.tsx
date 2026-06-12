@@ -75,7 +75,7 @@ export default function Docs() {
             </tbody>
           </table>
           <div className="spread" style={{ marginTop: 10 }}>
-            <input className="btn" style={{ cursor: 'text', fontWeight: 400 }} value={to} onChange={(e) => setTo(e.target.value)} placeholder="transmit to… (e.g. Finance — Cashier)" />
+            <input className="tin" value={to} onChange={(e) => setTo(e.target.value)} placeholder="transmit to… (e.g. Finance — Cashier)" />
             <button className="btn pri sm" onClick={() => void transmit()}>Scan to transmit ↗</button>
             <button className="btn sm" onClick={() => void receive()}>Scan to receive ↘</button>
           </div>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import type { ManComSnapshot } from '@ubi/types';
 import { api } from '../api';
 import { BarsChart, Sparkline, TrendChart } from '../charts';
-import { Chainage, SheetBar } from '../ui';
+import { Chainage, Loader, SheetBar } from '../ui';
 
 const peso = (centavos: number) => `₱${(centavos / 100 / 1_000_000).toFixed(1)}M`;
 
@@ -24,7 +24,7 @@ export default function ManCom() {
   }
 
   if (error) return <div className="err">{error}</div>;
-  if (!snap) return <div className="muted">Loading ManCom…</div>;
+  if (!snap) return <Loader label="Consolidating department read-models" />;
   const k = snap.kpis;
 
   return (
