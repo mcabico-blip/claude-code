@@ -10,6 +10,9 @@ import { DocTrackingService } from '../pillars/doc-tracking/doc-tracking.service
 import { DEPARTMENTS } from '../modules/dept/dept.module';
 import { EngineeringModule } from '../modules/engineering/engineering.module';
 import { PayItemEntity, ProjectEntity } from '../modules/engineering/entities';
+import { ItModule, ItService } from '../modules/it/it.module';
+import { PropertyModule, PropertyService } from '../modules/property/property.module';
+import { RecordsModule, RecordsService } from '../modules/records/records.module';
 import { ExpiryService } from '../shared/expiry/expiry.module';
 
 /** Dev/demo seed — idempotent; runs only when the database is empty. */
@@ -22,6 +25,9 @@ export class SeedService implements OnApplicationBootstrap {
     private readonly auth: AuthService,
     private readonly docs: DocTrackingService,
     private readonly expiry: ExpiryService,
+    private readonly property: PropertyService,
+    private readonly records: RecordsService,
+    private readonly it: ItService,
     @InjectRepository(PayItemEntity) private readonly payItems: Repository<PayItemEntity>,
     @InjectRepository(ProjectEntity) private readonly projects: Repository<ProjectEntity>,
     @InjectRepository(InsightEntity) private readonly insights: Repository<InsightEntity>,
@@ -132,15 +138,17 @@ export class SeedService implements OnApplicationBootstrap {
     });
     await this.docs.transmit(ceoClaims, doc.code, 'Finance — J. Ramos', 'for cashier batching');
 
-    await this.expiry.add({ kind: 'vehicle-reg', refModule: 'records', title: 'Dump truck UBI-DT-114 registration', expiresOn: '2026-06-24' });
-    await this.expiry.add({ kind: 'insurance', refModule: 'records', title: 'Service vehicle UBI-SV-09 insurance', expiresOn: '2026-06-22' });
+    // Real department modules — assets, vehicle docs, physical index, IT.
+    await this.property.seed('seed');
+    await this.records.seed('seed');
+    await this.it.seed(ceoClaims);
 
     this.log.log('seed complete — ceo@ubi.ph/ceo123, admin/vpo/pm/pe, + dept heads head-<dept>@ubi.ph/head123');
   }
 }
 
 @Module({
-  imports: [DocTrackingModule, EngineeringModule],
+  imports: [DocTrackingModule, EngineeringModule, PropertyModule, RecordsModule, ItModule],
   providers: [SeedService],
 })
 export class SeedModule {}

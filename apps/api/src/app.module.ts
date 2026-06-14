@@ -7,8 +7,11 @@ import { HealthController } from './health/health.controller';
 import { CeoModule } from './modules/ceo/ceo.module';
 import { DeptModule } from './modules/dept/dept.module';
 import { EngineeringModule } from './modules/engineering/engineering.module';
+import { ItModule } from './modules/it/it.module';
 import { OperationsModule } from './modules/operations/operations.module';
 import { ProcurementModule } from './modules/procurement/procurement.module';
+import { PropertyModule } from './modules/property/property.module';
+import { RecordsModule } from './modules/records/records.module';
 import { StubsModule } from './modules/stubs/stubs.module';
 import { AiLayerModule } from './pillars/ai-layer/ai-layer.module';
 import { AuthModule } from './pillars/auth/auth.module';
@@ -53,6 +56,9 @@ import { TicketingModule } from './shared/ticketing/ticketing.module';
     EngineeringModule,
     ProcurementModule,
     OperationsModule,
+    PropertyModule,
+    RecordsModule,
+    ItModule,
     DeptModule,
     StubsModule,
     CeoModule,

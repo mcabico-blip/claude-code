@@ -68,30 +68,8 @@ export class StubReadModelsService implements OnModuleInit {
       ],
     );
 
-    this.registry.register(
-      {
-        key: 'it.capacity',
-        module: 'it',
-        title: 'Capacity planning & controls',
-        description: 'Resource headroom + projected breach dates (scaling triggers).',
-      },
-      () => [
-        { resource: 'Storage (320 GB SSD)', usedPct: 41, trend: 'rising', projectedBreach: '2027-02', status: 'green' },
-        { resource: 'Data transfer (6 TB/mo)', usedPct: 22, trend: 'stable', projectedBreach: null, status: 'green' },
-        { resource: 'Postgres size', usedPct: 18, trend: 'rising', projectedBreach: null, status: 'green' },
-        { resource: 'UPS load vs rated', usedPct: 63, trend: 'stable', projectedBreach: null, status: 'amber' },
-      ],
-    );
-
-    this.registry.register(
-      {
-        key: 'records.expiry',
-        module: 'records',
-        title: 'Expiring registrations & insurance',
-        description: 'Vehicle reg, insurance, stamps — alarm before lapse.',
-      },
-      () => this.expiry.upcoming(30),
-    );
+    // NOTE: it.capacity, records.expiry and property.assets are now owned by
+    // the real ItModule / RecordsModule / PropertyModule.
 
     this.registry.register(
       {
@@ -131,19 +109,6 @@ export class StubReadModelsService implements OnModuleInit {
 
     this.registry.register(
       {
-        key: 'property.assets',
-        module: 'property',
-        title: 'Asset custody (QR EAM)',
-        description: 'Who holds what; monthly custodian attestation trail.',
-      },
-      () => [
-        { qr: 'AST-00112', type: 'Total station', custodian: 'Survey — Reyes', location: 'PKG-02 site office', status: 'in-use' },
-        { qr: 'AST-00387', type: 'Plate compactor', custodian: 'PKG-05 warehouse', location: 'PKG-05', status: 'in-use' },
-      ],
-    );
-
-    this.registry.register(
-      {
         key: 'finance.doc-flow',
         module: 'finance',
         title: 'Document batches in motion',
@@ -173,14 +138,12 @@ export class StubsController {
       : { error: `read model ${key} not registered` };
   }
 
+  // Real modules (it, records, property) own their own routes now.
   @Get('survey/volumes') survey(): unknown { return this.query('survey.volumes'); }
   @Get('mqc/certs') mqc(): unknown { return this.query('mqc.certs'); }
   @Get('audit/exceptions') audit(): unknown { return this.query('audit.exceptions'); }
-  @Get('it/capacity') it(): unknown { return this.query('it.capacity'); }
-  @Get('records/expiry') records(): unknown { return this.query('records.expiry'); }
   @Get('clinic/aggregate') clinic(): unknown { return this.query('clinic.aggregate'); }
   @Get('hr/hours') hr(): unknown { return this.query('hr.hours'); }
-  @Get('property/assets') property(): unknown { return this.query('property.assets'); }
   @Get('finance/doc-flow') finance(): unknown { return this.query('finance.doc-flow'); }
 }
 
