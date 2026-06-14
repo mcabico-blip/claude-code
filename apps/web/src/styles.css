@@ -299,6 +299,12 @@ code { font-family: var(--mono); font-size: 0.9em; letter-spacing: -0.2px; }
 .login .titleblock b { display: block; font-size: 10.5px; color: var(--ink); letter-spacing: 0.5px; }
 .err { background: #fdecec; border: 1.5px solid var(--bad); color: var(--bad); padding: 9px 12px; font-size: 12.5px; margin-bottom: 12px; }
 .hint { border: 1.5px dashed var(--teal); background: #f0f7f8; color: #0c5e75; padding: 10px 13px; font-size: 12px; margin-top: 16px; }
+.demos { margin-top: 16px; border-top: 1px dashed var(--line); padding-top: 12px; }
+.demos-h { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.demos-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.demo-chip { border: 1.5px solid var(--ink); background: var(--sheet); font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 5px 11px; box-shadow: 2px 2px 0 rgba(16,37,54,0.16); }
+.demo-chip:hover { background: var(--orange); color: #fff; border-color: var(--orange); transform: translate(-1px,-1px); }
+.demo-select { border: 1.5px solid var(--ink); background: var(--sheet); font-family: var(--mono); font-size: 11px; padding: 6px 10px; width: 100%; }
 
 /* ── chat ──────────────────────────────────────────────────────── */
 .chat { display: flex; flex-direction: column; gap: 11px; max-width: 740px; }

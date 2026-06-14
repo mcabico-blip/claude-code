@@ -3,12 +3,31 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { UserClaims } from '@ubi/types';
 import { api, homeFor, setSession } from '../api';
 
+const EXEC = [
+  ['ceo@ubi.ph', 'ceo123', 'CEO'],
+  ['vpo@ubi.ph', 'vpo123', 'VPO'],
+  ['admin@ubi.ph', 'admin123', 'Admin'],
+  ['pm@ubi.ph', 'pm123', 'PM'],
+  ['pe@ubi.ph', 'pe123', 'PE (field)'],
+] as const;
+
+const DEPT_HEADS = [
+  'engineering', 'procurement', 'operations', 'survey', 'mqc', 'audit',
+  'it', 'records', 'clinic', 'admin', 'hr', 'property', 'finance',
+];
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
+
+  function fill(em: string, pw: string) {
+    setEmail(em);
+    setPassword(pw);
+    setError(null);
+  }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -64,10 +83,27 @@ export default function Login() {
             <div>Rev<b>A</b></div>
           </div>
         </div>
+        <div className="demos">
+          <div className="demos-h">Tap to autofill a demo login</div>
+          <div className="demos-row">
+            {EXEC.map(([em, pw, label]) => (
+              <button key={em} type="button" className="demo-chip" onClick={() => fill(em, pw)}>{label}</button>
+            ))}
+          </div>
+          <div className="demos-row">
+            <select
+              className="demo-select"
+              defaultValue=""
+              onChange={(e) => { if (e.target.value) fill(`head-${e.target.value}@ubi.ph`, 'head123'); }}
+            >
+              <option value="" disabled>Department head…</option>
+              {DEPT_HEADS.map((d) => <option key={d} value={d}>{d} head</option>)}
+            </select>
+          </div>
+        </div>
+
         <div className="hint">
-          <b>Offline-ready:</b> after the first online sign-in this device keeps a secure session for field
-          use. Demo: <code>ceo@ubi.ph/ceo123</code> · <code>vpo@ubi.ph/vpo123</code> ·{' '}
-          <code>pm@ubi.ph/pm123</code> · <code>pe@ubi.ph/pe123</code>
+          <b>Offline-ready:</b> after the first online sign-in this device keeps a secure session for field use.
           <div style={{ marginTop: 7 }}>
             IT problem, no account? <Link to="/helpdesk">File a helpdesk ticket — no sign-in needed →</Link>
           </div>
