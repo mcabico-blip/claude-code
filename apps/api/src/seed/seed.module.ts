@@ -7,6 +7,7 @@ import { InsightEntity } from '../pillars/ai-layer/insight.entity';
 import { AuthService } from '../pillars/auth/auth.service';
 import { DocTrackingModule } from '../pillars/doc-tracking/doc-tracking.module';
 import { DocTrackingService } from '../pillars/doc-tracking/doc-tracking.service';
+import { DEPARTMENTS } from '../modules/dept/dept.module';
 import { EngineeringModule } from '../modules/engineering/engineering.module';
 import { PayItemEntity, ProjectEntity } from '../modules/engineering/entities';
 import { ExpiryService } from '../shared/expiry/expiry.module';
@@ -44,6 +45,17 @@ export class SeedService implements OnApplicationBootstrap {
       claims: ['role:pe', 'dept:engineering', 'scope:project-PKG-02'], isField: true,
     });
     await this.auth.ensureUser({ email: 'insights-agent@ubi.ph', name: 'Insights Agent (off-box)', password: 'agent123', claims: ['agent:insights'] });
+
+    // Department-head accounts — one per department, each scoped to its dept.
+    // They land on their own standard department dashboard.
+    for (const d of DEPARTMENTS) {
+      await this.auth.ensureUser({
+        email: d.headEmail,
+        name: d.headName,
+        password: 'head123',
+        claims: ['role:manager', `dept:${d.slug}`],
+      });
+    }
 
     await this.payItems.save(
       [
@@ -123,7 +135,7 @@ export class SeedService implements OnApplicationBootstrap {
     await this.expiry.add({ kind: 'vehicle-reg', refModule: 'records', title: 'Dump truck UBI-DT-114 registration', expiresOn: '2026-06-24' });
     await this.expiry.add({ kind: 'insurance', refModule: 'records', title: 'Service vehicle UBI-SV-09 insurance', expiresOn: '2026-06-22' });
 
-    this.log.log('seed complete — login ceo@ubi.ph / ceo123 (also admin, vpo, pm, pe, insights-agent)');
+    this.log.log('seed complete — ceo@ubi.ph/ceo123, admin/vpo/pm/pe, + dept heads head-<dept>@ubi.ph/head123');
   }
 }
 
