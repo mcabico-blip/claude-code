@@ -8,8 +8,11 @@ import Docs from './pages/Docs';
 import Engineering from './pages/Engineering';
 import Helpdesk from './pages/Helpdesk';
 import Insights from './pages/Insights';
+import It from './pages/It';
 import Login from './pages/Login';
 import ManCom from './pages/ManCom';
+import Property from './pages/Property';
+import Records from './pages/Records';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   return getToken() ? children : <Navigate to="/login" replace />;
@@ -29,6 +32,9 @@ export default function App() {
         <Route path="/approvals" element={<Approvals />} />
         <Route path="/docs" element={<Docs />} />
         <Route path="/engineering" element={<Engineering />} />
+        <Route path="/property" element={<Property />} />
+        <Route path="/records" element={<Records />} />
+        <Route path="/it" element={<It />} />
         <Route path="/dept/:slug" element={<Dept />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

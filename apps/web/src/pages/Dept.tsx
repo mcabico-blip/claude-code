@@ -12,6 +12,14 @@ interface DeptDashboard {
   camera: { id: string; label: string; online: boolean; streamUrl: string | null };
 }
 
+/** Departments with a dedicated tools page (deep workflows). */
+const TOOLS: Record<string, { path: string; label: string }> = {
+  engineering: { path: '/engineering', label: 'Open Engineering tools — projects · materials schedule' },
+  property: { path: '/property', label: 'Open Property tools — scan · re-custody · attest' },
+  records: { path: '/records', label: 'Open Records tools — expiry · vehicle docs · physical index' },
+  it: { path: '/it', label: 'Open IT control room — devices · PMS · DeskGuard · env' },
+};
+
 function Value({ v }: { v: unknown }) {
   if (v == null) return <span className="muted">—</span>;
   if (typeof v === 'boolean') return <span className={`st ${v ? 'st-ok' : 'st-warn'}`}>{String(v)}</span>;
@@ -80,9 +88,9 @@ export default function Dept() {
         note={`Head: ${dash.head.name} · monitoring ${dash.monitoring.src}`}
       />
 
-      {slug === 'engineering' && (
+      {TOOLS[slug] && (
         <div className="spread mb">
-          <Link to="/engineering" className="btn sm pri">Open Engineering tools — projects · materials schedule →</Link>
+          <Link to={TOOLS[slug].path} className="btn sm pri">{TOOLS[slug].label} →</Link>
         </div>
       )}
 
