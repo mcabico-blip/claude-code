@@ -1,5 +1,9 @@
 # Feature Audit vs Original Spec — 2026-06-14
 
+> **Update (build-all pass):** Property, Records and IT promoted from stubs to
+> real DB-backed modules — see "Build-all results" at the bottom.
+
+
 Measured against `CLAUDE.md` Part II. Status of the modules you asked about
 first (IT, Property, Records/Doc-Tracking), plus the cross-cutting
 department-dashboard layer added this session.
@@ -59,3 +63,39 @@ Endpoint: `GET /api/dept/:slug/dashboard` · registry in
    DeskGuard v2 (branch `it`).
 4. **CCTV** — set `CCTV_BASE_URL` to the Hikvision NVR snapshot base so every
    dept tile goes live.
+
+---
+
+## Build-all results — 2026-06-14 (this session)
+
+### Property — ✅ real QR EAM
+`asset` + `asset_movement` + `custodian_attestation` tables. Endpoints:
+scan (`POST /property/assets/:qr/scan` — updates location/status/custodian +
+logs movement), monthly attestation, full movement history. Tools page
+`/property`. Active assets feed the IT PMS scheduler.
+
+### Records — ✅ real
+`vehicle_doc` registry (reg/insurance/stamp) auto-mirrors into the shared
+expiry engine; `records.expiry` now DB-backed. `physical_location` index is
+**access-gated per row** — restricted titles (e.g. land titles → `role:legal`)
+are masked unless the caller holds the claim (verified: records head sees
+dept rows, legal row stays locked; IT head sees all locked). Tools page
+`/records`.
+
+### IT — ✅ depth added
+`it_device` (SNMP targets: UPS/switch/NVR/firewall), `it_pms` (quarterly,
+**auto-generated from Property assets**), `deskguard_entry` (self-report +
+mandatory consent banner surfaced in UI), `env_reading` (DHT22/IPMI temp).
+Read-models: it.capacity, it.devices, it.pms, it.deskguard, it.env. Control
+room page `/it`.
+
+### Cross-cutting
+- 21 Pillar-3 read-models registered (was 15) — all flow into dept dashboards,
+  ManCom and Ask AI.
+- Login page: clickable demo-login chips (autofill) + dept-head selector.
+
+### Still stub / not started
+- IT SNMP **live polling** + topology map (device list is real, polling is not).
+- Survey, MQC, Audit, Clinic, Admin, HR, Finance remain read-surface stubs
+  (render in dept dashboards; deep workflows pending per module branch).
+- CCTV needs `CCTV_BASE_URL` → Hikvision NVR to go live.
