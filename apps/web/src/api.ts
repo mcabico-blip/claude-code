@@ -48,3 +48,11 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
 export function hasClaim(user: UserClaims | null, claim: string): boolean {
   return !!user && (user.claims.includes(claim) || user.claims.includes('role:admin'));
 }
+
+/** Landing route by role: exec → ManCom, dept head → their dashboard, else work. */
+export function homeFor(claims: string[]): string {
+  if (claims.some((c) => ['role:ceo', 'role:vpo', 'role:admin'].includes(c))) return '/mancom';
+  const dept = claims.find((c) => c.startsWith('dept:'))?.slice(5);
+  if (dept && claims.includes('role:manager')) return `/dept/${dept}`;
+  return '/approvals';
+}

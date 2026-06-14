@@ -309,6 +309,36 @@ code { font-family: var(--mono); font-size: 0.9em; letter-spacing: -0.2px; }
 .askrow input { flex: 1; border: 2px solid var(--ink); background: var(--sheet); padding: 10px 16px; box-shadow: 3px 3px 0 rgba(16, 37, 54, 0.14); }
 .askrow input:focus { outline: 2px solid var(--orange); outline-offset: 1px; }
 
+/* ── department dashboard: monitoring + CCTV ───────────────────── */
+.deptgrid { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; }
+@media (max-width: 1000px) { .deptgrid { grid-template-columns: 1fr; } }
+.kpi-bar { height: 4px; margin-top: 9px; background: var(--line); }
+.kpi-bar.tone-ok { background: var(--ok); }
+.kpi-bar.tone-warn { background: var(--warn); }
+.kpi-bar.tone-bad { background: repeating-linear-gradient(135deg, var(--bad) 0 6px, var(--ink) 6px 12px); }
+.kpi-bar.tone-info { background: var(--teal); }
+.kpi .val .mc-proj { display: none; }
+
+.cctv-card { display: flex; flex-direction: column; }
+.cctv { border: 2px solid var(--ink); background: #07121b; color: #c7d6e2; font-family: var(--mono); position: relative; overflow: hidden; }
+.cctv.live { border-color: var(--ok); }
+.cctv-top, .cctv-bot { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; font-size: 9px; letter-spacing: 1px; background: rgba(0,0,0,0.5); position: relative; z-index: 2; }
+.cctv-rec { color: #ff5a5a; font-weight: 700; }
+.cctv.live .cctv-rec { color: #4ade80; animation: recblink 1.4s steps(1) infinite; }
+@keyframes recblink { 50% { opacity: 0.35; } }
+.cctv-ts { color: #8fa6b8; }
+.cctv-noise { height: 150px; position: relative; background:
+  repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 3px),
+  radial-gradient(ellipse at 50% 40%, #16313f, #07121b 70%); }
+.cctv-feed { width: 100%; height: 150px; object-fit: cover; display: block; }
+.cctv-cross { position: absolute; inset: 0; }
+.cctv-cross::before, .cctv-cross::after { content: ''; position: absolute; background: rgba(143,166,184,0.25); }
+.cctv-cross::before { left: 50%; top: 0; bottom: 0; width: 1px; }
+.cctv-cross::after { top: 50%; left: 0; right: 0; height: 1px; }
+.cctv-offline { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; letter-spacing: 3px; color: #5b7488; }
+.cctv-bot .cctv-dot { width: 7px; height: 7px; border-radius: 50%; background: #ff5a5a; }
+.cctv.live .cctv-bot .cctv-dot { background: #4ade80; }
+
 .muted { color: var(--muted); }
 .spread { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .spread .right { margin-left: auto; }

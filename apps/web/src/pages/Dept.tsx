@@ -1,24 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { api } from '../api';
-import { Loader, SheetBar } from '../ui';
+import { CctvThumb, KpiBand, Loader, SheetBar } from '../ui';
 
-/** Breadth-first department pages: render the module's read surface as-is.
- *  Deep workflows land per module branch (see CLAUDE.md §11). */
-const endpoints: Record<string, { title: string; path: string; src: string }> = {
-  procurement: { title: 'Procurement — supplier performance', path: '/procurement/supplier-performance', src: 'procurement.supplier-performance' },
-  operations: { title: 'Operations — VPO control tower', path: '/operations/health', src: 'operations.health' },
-  survey: { title: 'Survey — monthly volumes', path: '/survey/volumes', src: 'survey.volumes' },
-  mqc: { title: 'MQC — certificate queue', path: '/mqc/certs', src: 'mqc.certs' },
-  audit: { title: 'Audit — exception register', path: '/audit/exceptions', src: 'audit.exceptions' },
-  it: { title: 'IT — capacity planning & controls', path: '/it/capacity', src: 'it.capacity' },
-  records: { title: 'Records — expiring documents', path: '/records/expiry', src: 'records.expiry' },
-  clinic: { title: 'Clinic — aggregate summary (isolated)', path: '/clinic/aggregate', src: 'clinic.aggregate' },
-  admin: { title: 'Admin / OHS — inquiries (shared ticketing)', path: '/tickets?source=admin', src: 'admin.tickets' },
-  hr: { title: 'HR — hours computation runs', path: '/hr/hours', src: 'hr.hours' },
-  property: { title: 'Property — asset custody (QR EAM)', path: '/property/assets', src: 'property.assets' },
-  finance: { title: 'Finance — documents in motion', path: '/finance/doc-flow', src: 'finance.doc-flow' },
-};
+interface DeptDashboard {
+  slug: string;
+  label: string;
+  head: { email: string; name: string };
+  kpis: Array<{ label: string; value: string; sub: string; tone: 'ok' | 'warn' | 'bad' | 'info' }>;
+  monitoring: { title: string; src: string; data: unknown };
+  camera: { id: string; label: string; online: boolean; streamUrl: string | null };
+}
 
 function Value({ v }: { v: unknown }) {
   if (v == null) return <span className="muted">—</span>;
@@ -42,45 +34,81 @@ function AutoTable({ rows }: { rows: Array<Record<string, unknown>> }) {
   );
 }
 
+function Monitoring({ data }: { data: unknown }) {
+  if (Array.isArray(data)) return <AutoTable rows={data as Array<Record<string, unknown>>} />;
+  if (data && typeof data === 'object') {
+    return (
+      <table className="tbl">
+        <tbody>
+          {Object.entries(data as Record<string, unknown>).map(([k, v]) => (
+            <tr key={k}>
+              <td style={{ width: 220 }}><b>{k}</b></td>
+              <td>{Array.isArray(v) ? <AutoTable rows={v as Array<Record<string, unknown>>} /> : <Value v={v} />}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }
+  return <div className="muted">No data.</div>;
+}
+
+/** Standard department dashboard — same shape for every department:
+ *  uniform KPI band · field monitoring (the dept's read-model) · CCTV thumbnail. */
 export default function Dept() {
   const { slug = '' } = useParams();
-  const meta = endpoints[slug];
-  const [data, setData] = useState<unknown>(null);
+  const [dash, setDash] = useState<DeptDashboard | null>(null);
   const [tickets, setTickets] = useState<Array<Record<string, unknown>> | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setData(null);
+    setDash(null);
     setTickets(null);
     setError(null);
-    if (meta) api<unknown>(meta.path).then(setData).catch((e: Error) => setError(e.message));
-    if (slug === 'it') {
-      api<Array<Record<string, unknown>>>('/tickets?source=it').then(setTickets).catch(() => {});
-    }
+    api<DeptDashboard>(`/dept/${slug}/dashboard`).then(setDash).catch((e: Error) => setError(e.message));
+    if (slug === 'it') api<Array<Record<string, unknown>>>('/tickets?source=it').then(setTickets).catch(() => {});
   }, [slug]);
 
-  if (!meta) return <div className="err">Unknown department: {slug}</div>;
+  if (error) return <><SheetBar sheet="DEPT" title={slug} note="department dashboard" /><div className="err">{error}</div></>;
+  if (!dash) return <><SheetBar sheet="DEPT" title={slug} note="department dashboard" /><Loader label={`Loading ${slug} dashboard`} /></>;
 
   return (
     <>
-      <SheetBar sheet={`${slug.slice(0, 3).toUpperCase()}-RM`} title={meta.title} note={`Read surface · ${meta.src} · deep workflows land on the ${slug} branch`} />
-      {error && <div className="err">{error}</div>}
-      {!error && data == null && <Loader label={`Querying ${meta.src}`} />}
-      {Array.isArray(data) && <div className="card"><AutoTable rows={data as Array<Record<string, unknown>>} /></div>}
-      {!Array.isArray(data) && data != null && typeof data === 'object' && (
-        <div className="card">
-          <table className="tbl">
-            <tbody>
-              {Object.entries(data as Record<string, unknown>).map(([k, v]) => (
-                <tr key={k}>
-                  <td style={{ width: 220 }}><b>{k}</b></td>
-                  <td>{Array.isArray(v) ? <AutoTable rows={v as Array<Record<string, unknown>>} /> : <Value v={v} />}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <SheetBar
+        sheet={`${slug.slice(0, 3).toUpperCase()}-DH`}
+        title={`${dash.label} — Department Dashboard`}
+        note={`Head: ${dash.head.name} · monitoring ${dash.monitoring.src}`}
+      />
+
+      {slug === 'engineering' && (
+        <div className="spread mb">
+          <Link to="/engineering" className="btn sm pri">Open Engineering tools — projects · materials schedule →</Link>
         </div>
       )}
+
+      <KpiBand kpis={dash.kpis} />
+
+      <div className="deptgrid">
+        <div className="card">
+          <div className="ph">
+            <b>Field monitoring — {dash.monitoring.title}</b>
+            <span className="src">SRC · {dash.monitoring.src}</span>
+          </div>
+          <Monitoring data={dash.monitoring.data} />
+        </div>
+
+        <div className="card cctv-card">
+          <div className="ph">
+            <b>CCTV</b>
+            <span className="src">{dash.camera.id}</span>
+          </div>
+          <CctvThumb label={dash.camera.label} online={dash.camera.online} streamUrl={dash.camera.streamUrl} />
+          <div className="muted" style={{ fontSize: 11, marginTop: 8 }}>
+            {dash.camera.online ? 'Live thumbnail from NVR.' : 'Set CCTV_BASE_URL to link the Hikvision NVR snapshot.'}
+          </div>
+        </div>
+      </div>
+
       {slug === 'it' && tickets && (
         <div className="card" style={{ marginTop: 14 }}>
           <div className="ph">

@@ -77,6 +77,61 @@ export function Chainage({ pct, label, tone = 'teal' }: { pct: number; label?: s
   );
 }
 
+/** CCTV thumbnail — a real-looking camera tile. Shows the live snapshot when
+ *  an NVR stream is wired (camera.online), else an honest NO-SIGNAL placeholder. */
+export function CctvThumb({
+  label,
+  online,
+  streamUrl,
+}: {
+  label: string;
+  online: boolean;
+  streamUrl?: string | null;
+}) {
+  return (
+    <div className={`cctv${online ? ' live' : ''}`}>
+      <div className="cctv-top">
+        <span className="cctv-rec">{online ? '● REC' : '○ NO SIGNAL'}</span>
+        <span className="cctv-ts">{new Date().toLocaleString('en-PH', { hour12: false })}</span>
+      </div>
+      {online && streamUrl ? (
+        <img className="cctv-feed" src={streamUrl} alt={label} />
+      ) : (
+        <div className="cctv-noise">
+          <div className="cctv-cross" />
+          <div className="cctv-offline">NVR NOT LINKED</div>
+        </div>
+      )}
+      <div className="cctv-bot">
+        <span>{label}</span>
+        <span className="cctv-dot" />
+      </div>
+    </div>
+  );
+}
+
+/** Standard KPI band — identical four-card shape on every dept dashboard. */
+export function KpiBand({
+  kpis,
+}: {
+  kpis: Array<{ label: string; value: string; sub: string; tone: 'ok' | 'warn' | 'bad' | 'info' }>;
+}) {
+  return (
+    <div className="kpis">
+      {kpis.map((k) => (
+        <div className="kpi" key={k.label}>
+          <div className="lab">{k.label}</div>
+          <div className="val">
+            {k.value} <span className={`mchip mc-${k.tone === 'bad' ? 'bad' : 'proj'}`} style={k.tone === 'ok' ? { display: 'none' } : undefined} />
+          </div>
+          <div className="sub">{k.sub}</div>
+          <div className={`kpi-bar tone-${k.tone}`} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** Drawing title block — every page header reads like a sheet legend. */
 export function SheetBar({ sheet, title, note }: { sheet: string; title: string; note?: string }) {
   return (

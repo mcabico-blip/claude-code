@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { getToken, getUser, hasClaim } from './api';
+import { getToken, getUser, homeFor } from './api';
 import Shell from './Shell';
 import Approvals from './pages/Approvals';
 import Ask from './pages/Ask';
@@ -16,8 +16,7 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 }
 
 export default function App() {
-  const user = getUser();
-  const home = hasClaim(user, 'role:ceo') || hasClaim(user, 'role:vpo') ? '/mancom' : '/approvals';
+  const home = homeFor(getUser()?.claims ?? []);
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
@@ -29,7 +28,7 @@ export default function App() {
         <Route path="/ask" element={<Ask />} />
         <Route path="/approvals" element={<Approvals />} />
         <Route path="/docs" element={<Docs />} />
-        <Route path="/dept/engineering" element={<Engineering />} />
+        <Route path="/engineering" element={<Engineering />} />
         <Route path="/dept/:slug" element={<Dept />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

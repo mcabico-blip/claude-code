@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import type { UserClaims } from '@ubi/types';
-import { api, setSession } from '../api';
+import { api, homeFor, setSession } from '../api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,8 +20,7 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       });
       setSession(res.token, res.user);
-      const executive = res.user.claims.some((c) => ['role:ceo', 'role:vpo', 'role:admin'].includes(c));
-      navigate(executive ? '/mancom' : '/approvals');
+      navigate(homeFor(res.user.claims));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'login failed');
     } finally {
