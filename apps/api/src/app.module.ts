@@ -11,6 +11,7 @@ import { ItModule } from './modules/it/it.module';
 import { OperationsModule } from './modules/operations/operations.module';
 import { ProcurementModule } from './modules/procurement/procurement.module';
 import { PropertyModule } from './modules/property/property.module';
+import { QuantityModule } from './modules/quantity/quantity.module';
 import { RecordsModule } from './modules/records/records.module';
 import { StubsModule } from './modules/stubs/stubs.module';
 import { AiLayerModule } from './pillars/ai-layer/ai-layer.module';
@@ -54,6 +55,7 @@ import { TicketingModule } from './shared/ticketing/ticketing.module';
     ExpiryModule,
     // Department modules (breadth-first; deep work on module branches).
     EngineeringModule,
+    QuantityModule,
     ProcurementModule,
     OperationsModule,
     PropertyModule,

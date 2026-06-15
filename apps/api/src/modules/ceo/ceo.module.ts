@@ -8,6 +8,7 @@ import { ReadModelRegistry } from '../../pillars/ai-layer/read-model.registry';
 import { ApprovalsService } from '../../shared/approvals/approvals.service';
 import { ProjectEntity } from '../engineering/entities';
 import { EngineeringModule } from '../engineering/engineering.module';
+import { QuantityModule, QuantityService } from '../quantity/quantity.module';
 import { seedReportFeed } from '../stubs/stubs.module';
 
 /**
@@ -20,6 +21,7 @@ export class CeoService {
   constructor(
     private readonly registry: ReadModelRegistry,
     private readonly approvals: ApprovalsService,
+    private readonly quantity: QuantityService,
     @InjectRepository(ProjectEntity) private readonly projects: Repository<ProjectEntity>,
     @InjectRepository(InsightEntity) private readonly insights: Repository<InsightEntity>,
   ) {}
@@ -57,6 +59,14 @@ export class CeoService {
       ? projects.reduce((sum, p) => sum + p.slippagePct, 0) / projects.length
       : 0;
 
+    // Real accomplishment from the Quantity weekly rollup (QE field entries).
+    const qhead = await this.quantity.headSummary();
+    const quantityTop = qhead.rows
+      .slice()
+      .sort((a, b) => b.thisMonth - a.thisMonth)
+      .slice(0, 5)
+      .map((r) => ({ code: r.code, name: r.name, pe: r.pe, pct: r.pct, thisMonth: r.thisMonth }));
+
     return {
       asOf: new Date().toISOString(),
       kpis: {
@@ -70,12 +80,15 @@ export class CeoService {
         projectedSlippagePct: Number((avgSlippage - 0.6).toFixed(2)),
         openExceptions: exceptions.length,
         escalatedExceptions: exceptions.filter((e) => e.status === 'escalated').length,
+        accomplishmentPct: Number(qhead.overallPct.toFixed(4)),
+        accomplishmentMonth: Math.round(qhead.thisMonth),
       },
       accomplishment,
       surveyVolumes,
       flagged,
       reportFeed: seedReportFeed(),
       topInsights,
+      quantityTop,
     };
   }
 
@@ -106,7 +119,7 @@ export class CeoController {
 }
 
 @Module({
-  imports: [EngineeringModule],
+  imports: [EngineeringModule, QuantityModule],
   controllers: [CeoController],
   providers: [CeoService],
 })
