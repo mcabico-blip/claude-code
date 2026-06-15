@@ -16,6 +16,10 @@ const DEPT_HEADS = [
   'it', 'records', 'clinic', 'admin', 'hr', 'property', 'finance',
 ];
 
+// Demo autofill chips advertise working credentials — never show them on a
+// production login page. Dev shows them; prod only if explicitly opted in.
+const SHOW_DEMOS = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_LOGINS === 'true';
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -83,6 +87,7 @@ export default function Login() {
             <div>Rev<b>A</b></div>
           </div>
         </div>
+        {SHOW_DEMOS && (
         <div className="demos">
           <div className="demos-h">Tap to autofill a demo login</div>
           <div className="demos-row">
@@ -101,6 +106,7 @@ export default function Login() {
             </select>
           </div>
         </div>
+        )}
 
         <div className="hint">
           <b>Offline-ready:</b> after the first online sign-in this device keeps a secure session for field use.

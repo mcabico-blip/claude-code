@@ -48,9 +48,11 @@
 ## 4. Migrate / restart
 - DB: with `DB_SYNC=true`, new tables/columns auto-create on boot — fine for demo.
   If RELEASE_NOTES.md says "run migration", run `npm run migration:run` (when it exists).
-- Restart the API the way it runs here (discover it): `pm2 restart ubi-api` **or**
-  `systemctl restart ubi-api`. Web is static (`apps/web/dist`) served by nginx — no
-  restart needed unless nginx config changed.
+- Restart the API: **`systemctl restart ubi-edge`** (the service binds
+  127.0.0.1:8091 behind nginx on this box). Confirm it came up with
+  `systemctl status ubi-edge` / `journalctl -u ubi-edge -n 50`. Web is static
+  (`apps/web/dist`) served by nginx — no restart needed unless nginx config changed.
+  (If the unit name ever changes, discover it: `systemctl list-units | grep -i ubi`.)
 
 ## 5. Health check (the gate)
 - `curl -fsS https://edge.ubi-as.com/api/health` must return `{"status":"ok"...}`.
