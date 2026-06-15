@@ -9,6 +9,8 @@ export default function Docs() {
   const [answer, setAnswer] = useState<WhereIsAnswer | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [to, setTo] = useState('');
+  const [showNew, setShowNew] = useState(false);
+  const [nw, setNw] = useState({ type: 'Transmittal', title: '', location: '' });
 
   const refresh = () => api<TrackedDocument[]>('/docs').then(setDocs).catch((e: Error) => setError(e.message));
   useEffect(() => { void refresh(); }, []);
@@ -28,6 +30,21 @@ export default function Docs() {
     void lookup(code);
   }
 
+  async function createDoc(e: FormEvent) {
+    e.preventDefault();
+    if (!nw.title.trim()) return;
+    try {
+      const doc = await api<TrackedDocument>('/docs', { method: 'POST', body: JSON.stringify(nw) });
+      setShowNew(false);
+      setNw({ type: 'Transmittal', title: '', location: '' });
+      await refresh();
+      setCode(doc.code);
+      await lookup(doc.code); // open it so you can transmit immediately
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'create failed');
+    }
+  }
+
   async function transmit() {
     if (!answer || !to.trim()) return;
     await api(`/docs/${answer.document.code}/transmit`, { method: 'POST', body: JSON.stringify({ to }) });
@@ -45,12 +62,33 @@ export default function Docs() {
 
   return (
     <>
-      <SheetBar sheet="DOC-04" title="Document Tracking — transmittal registry" note="Pillar 2 backbone · scan to transmit / scan to receive" />
+      <SheetBar sheet="DOC-04" title="Document Tracking — transmittal registry" note="Pillar 2 backbone · register → scan to transmit → scan to receive" />
 
-      <form className="askrow mb" onSubmit={submit}>
-        <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Where is… (scan or type a code, e.g. DOC-2026-00001)" />
-        <button className="btn pri">Find</button>
-      </form>
+      <div className="spread mb">
+        <form className="askrow" style={{ flex: 1 }} onSubmit={submit}>
+          <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Where is… (scan or type a code, e.g. DOC-2026-00001)" />
+          <button className="btn pri">Find</button>
+        </form>
+        <button className="btn navy" onClick={() => setShowNew((s) => !s)}>{showNew ? 'Cancel' : '+ New transmittal'}</button>
+      </div>
+
+      {showNew && (
+        <form className="card mb" onSubmit={createDoc}>
+          <div className="ph"><b>Register a new document / transmittal</b><span className="src">gets a QR code + tracking id</span></div>
+          <div className="spread">
+            <label className="muted" style={{ fontSize: 11 }}>Type
+              <select className="tin" value={nw.type} onChange={(e) => setNw({ ...nw, type: e.target.value })}>
+                {['Transmittal', 'Payment request', 'Billing attachment', 'Purchase request', 'Correspondence', 'Controlled document'].map((t) => <option key={t}>{t}</option>)}
+              </select>
+            </label>
+            <input className="tin" style={{ flex: 1, minWidth: 240 }} value={nw.title} onChange={(e) => setNw({ ...nw, title: e.target.value })} placeholder="Title, e.g. Billing No. 8 — attachments batch (PKG-02)" required />
+            <input className="tin" value={nw.location} onChange={(e) => setNw({ ...nw, location: e.target.value })} placeholder="Origin location (optional)" />
+            <button className="btn pri sm">Register</button>
+          </div>
+          <div className="muted" style={{ fontSize: 11, marginTop: 8 }}>You become the current holder; then transmit it to the next department below.</div>
+        </form>
+      )}
+
       {error && <div className="err">{error}</div>}
 
       {answer && (
