@@ -29,6 +29,10 @@ export class AssetEntity extends BaseAppEntity {
   @Column()
   type: string;
 
+  /** Coarse category for PMS selection, e.g. "Heavy equipment", "IT equipment". */
+  @Column({ default: 'General' })
+  category: string;
+
   @Column({ type: 'varchar', default: 'idle' })
   status: AssetStatus;
 
@@ -197,14 +201,30 @@ export class PropertyService implements OnModuleInit {
     return this.assets.find({ where: { pmsEligible: true } });
   }
 
+  /** Distinct categories among PMS-eligible assets (for the scheduler picker). */
+  async categories(): Promise<Array<{ category: string; count: number }>> {
+    const rows = await this.assets.find({ where: { pmsEligible: true } });
+    const map = new Map<string, number>();
+    for (const a of rows) map.set(a.category, (map.get(a.category) ?? 0) + 1);
+    return [...map.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => a.category.localeCompare(b.category));
+  }
+
+  pmsEligibleByCategories(categories: string[]): Promise<AssetEntity[]> {
+    return this.assets.find({ where: { pmsEligible: true } }).then((rows) =>
+      categories.length ? rows.filter((a) => categories.includes(a.category)) : rows,
+    );
+  }
+
   async seed(creator: string): Promise<void> {
     if ((await this.assets.count()) > 0) return;
     const rows: Array<Partial<AssetEntity>> = [
-      { qr: 'AST-00112', type: 'Total station (Leica TS07)', status: 'in-use', location: 'PKG-02 site office', custodian: 'Survey — Reyes' },
-      { qr: 'AST-00387', type: 'Plate compactor', status: 'in-use', location: 'PKG-05', custodian: 'PKG-05 warehouse' },
-      { qr: 'AST-00421', type: 'Laptop (Dell 5440)', status: 'in-use', location: 'HQ 3F Engineering', custodian: 'Engr. dela Cruz' },
-      { qr: 'AST-00455', type: 'Concrete vibrator', status: 'maintenance', location: 'HQ motor pool', custodian: 'Property warehouse' },
-      { qr: 'AST-00501', type: 'Generator 10kVA', status: 'idle', location: 'PKG-11 yard', custodian: 'PKG-11 warehouse' },
+      { qr: 'AST-00112', type: 'Total station (Leica TS07)', category: 'Survey equipment', status: 'in-use', location: 'PKG-02 site office', custodian: 'Survey — Reyes' },
+      { qr: 'AST-00387', type: 'Plate compactor', category: 'Heavy equipment', status: 'in-use', location: 'PKG-05', custodian: 'PKG-05 warehouse' },
+      { qr: 'AST-00421', type: 'Laptop (Dell 5440)', category: 'IT equipment', status: 'in-use', location: 'HQ 3F Engineering', custodian: 'Engr. dela Cruz' },
+      { qr: 'AST-00455', type: 'Concrete vibrator', category: 'Heavy equipment', status: 'maintenance', location: 'HQ motor pool', custodian: 'Property warehouse' },
+      { qr: 'AST-00501', type: 'Generator 10kVA', category: 'Power equipment', status: 'idle', location: 'PKG-11 yard', custodian: 'PKG-11 warehouse' },
+      { qr: 'AST-00540', type: 'Desktop + UPS (admin)', category: 'IT equipment', status: 'in-use', location: 'HQ 2F Admin', custodian: 'Admin — Flores' },
+      { qr: 'AST-00566', type: 'Backhoe loader', category: 'Heavy equipment', status: 'in-use', location: 'PKG-05', custodian: 'PKG-05 motor pool' },
     ];
     for (const r of rows) {
       const a = await this.assets.save(this.assets.create({ ...r, createdBy: creator }));
