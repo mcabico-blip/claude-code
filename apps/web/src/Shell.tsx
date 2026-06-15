@@ -53,11 +53,11 @@ export default function Shell() {
             <div className="sgrp">Office of the President</div>
             {item('/mancom', 'ManCom')}
             {item('/insights', 'AI Insights')}
-            {item('/ask', 'Ask AI')}
           </>
         )}
 
         <div className="sgrp">Work</div>
+        {item('/ask', 'Ask AI')}
         {item('/approvals', 'Approvals')}
         {item('/docs', 'Documents')}
         {item('/helpdesk', 'Helpdesk')}
