@@ -47,7 +47,7 @@ export class SeedService implements OnApplicationBootstrap {
     // Accounts are idempotent (ensureUser returns existing) — run every boot so
     // newly-added dept-head accounts also backfill onto an existing demo DB.
     await this.auth.ensureUser({ email: 'admin@ubi.ph', name: 'Suite Admin', password: 'admin123', claims: ['role:admin'] });
-    const ceo = await this.auth.ensureUser({ email: 'ceo@ubi.ph', name: 'E. Castillo', password: 'ceo123', claims: ['role:ceo'] });
+    const ceo = await this.auth.ensureUser({ email: 'ceo@ubi.ph', name: 'Car Go', password: 'ceo123', claims: ['role:ceo'] });
     await this.auth.ensureUser({ email: 'vpo@ubi.ph', name: 'VPO Office', password: 'vpo123', claims: ['role:vpo', 'dept:operations'] });
     await this.auth.ensureUser({ email: 'pm@ubi.ph', name: 'PM Uy', password: 'pm123', claims: ['role:pm', 'dept:engineering'] });
     await this.auth.ensureUser({

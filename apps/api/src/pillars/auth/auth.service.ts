@@ -54,7 +54,14 @@ export class AuthService {
     entity?: 'UBI' | 'OMEGA';
   }): Promise<UserEntity> {
     const existing = await this.findByEmail(input.email);
-    if (existing) return existing;
+    if (existing) {
+      // Keep the demo display name in sync with the seed (idempotent).
+      if (input.name && existing.name !== input.name) {
+        existing.name = input.name;
+        return this.users.save(existing);
+      }
+      return existing;
+    }
     const user = this.users.create({
       email: input.email.toLowerCase(),
       name: input.name,
