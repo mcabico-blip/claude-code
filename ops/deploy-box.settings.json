@@ -1,0 +1,34 @@
+{
+  "_comment": "Copy to the deploy box at <repo>/.claude/settings.json (or merge). Pre-approves deploy-shaped actions so headless `claude -p` runs without prompts, while still refusing dangerous commands. Tighten to taste.",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "Write",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(git reset:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push origin production)",
+      "Bash(npm install)",
+      "Bash(npm run build*)",
+      "Bash(npm run migration:run)",
+      "Bash(pm2 restart ubi-api)",
+      "Bash(pm2 logs:*)",
+      "Bash(systemctl restart ubi-api)",
+      "Bash(systemctl status ubi-api)",
+      "Bash(journalctl -u ubi-api:*)",
+      "Bash(curl -fsS https://edge.ubi-as.com/*)",
+      "Bash(psql:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git push:* main)",
+      "Bash(git push --force:*)",
+      "Bash(psql:* DROP DATABASE*)",
+      "Bash(docker* down -v*)"
+    ]
+  }
+}

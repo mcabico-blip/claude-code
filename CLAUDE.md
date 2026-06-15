@@ -55,6 +55,17 @@ printed in this repo.
 
 Micro-commits, conventional scopes per §11.
 
+### Deploying (Claude-driven CD — see `ops/README.md`)
+- Dev happens on the feature branch → merged into **`kickoff-build`**.
+- **"build production"** = Cloud Claude fast-forwards the **`production`** branch
+  to the reviewed `kickoff-build` tip and pushes it (noting any env/migration
+  steps in `ops/RELEASE_NOTES.md`).
+- A trigger on the box (1-min systemd timer and/or GitHub webhook) wakes
+  **Server Claude** (`claude -p` reading `ops/DEPLOY.md`) which deploys, **fixes
+  issues or rolls back**, and pushes `ops/DEPLOY_STATUS.md` back.
+- At session start, Cloud Claude should read `ops/DEPLOY_STATUS.md` and act on
+  its `for_cloud_claude:` line.
+
 ---
 
 ## 1. What this is

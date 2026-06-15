@@ -1,0 +1,14 @@
+# Option B (polling): oneshot that runs the trigger; paired with ubi-deploy.timer.
+# install: cp ops/systemd/ubi-deploy.* /etc/systemd/system/ && systemctl enable --now ubi-deploy.timer
+[Unit]
+Description=UBI Suite — wake Server Claude to deploy if production changed
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/srv/ubi
+Environment=UBI_REPO=/srv/ubi
+# Ensure `claude` and `node` are on PATH for the service user:
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/home/deploy/.local/bin
+ExecStart=/usr/bin/env bash ops/wake-claude-deploy.sh
