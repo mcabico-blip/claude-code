@@ -5,6 +5,10 @@
 > clear stale notes after they're applied.
 
 ## Pending for next deploy
+- **Demo login chips are now hard-off in prod** (repo-authoritative). Also remove any
+  leftover `VITE_SHOW_DEMO_LOGINS` / `VITE_HIDE_DEMO_LOGINS` line from the box's
+  `apps/web/.env` (no longer used) and rebuild — verify the served bundle has no
+  `demo-chip` / `head123`.
 - **Search-engine block (POC):** the build now ships `robots.txt` (Disallow /) and a
   `<meta name=robots noindex>`. Also add to the LIVE nginx vhost (server-side):
   `add_header X-Robots-Tag "noindex, nofollow" always;` (see ops/nginx.sample.conf),

@@ -16,9 +16,9 @@ const DEPT_HEADS = [
   'it', 'records', 'clinic', 'admin', 'hr', 'property', 'finance',
 ];
 
-// Real data now: demo tap-to-login chips are OFF in production (only shown in
-// local dev, or if explicitly opted in with VITE_SHOW_DEMO_LOGINS=true).
-const SHOW_DEMOS = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_LOGINS === 'true';
+// Real data now: demo tap-to-login is shown ONLY in local dev. No env override —
+// a production build always strips it, regardless of any box-side VITE_* flag.
+const SHOW_DEMOS = import.meta.env.DEV;
 
 export default function Login() {
   const [email, setEmail] = useState('');
