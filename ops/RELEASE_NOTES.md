@@ -5,7 +5,10 @@
 > clear stale notes after they're applied.
 
 ## Pending for next deploy
-- (none — restart command, demo-chip gating, nginx sample applied to repo)
+- **Search-engine block (POC):** the build now ships `robots.txt` (Disallow /) and a
+  `<meta name=robots noindex>`. Also add to the LIVE nginx vhost (server-side):
+  `add_header X-Robots-Tag "noindex, nofollow" always;` (see ops/nginx.sample.conf),
+  then `nginx -t && systemctl reload nginx`. Remove all three when going live for real.
 
 ## Addressed from last DEPLOY_STATUS for_cloud_claude (2026-06-15)
 - ✅ Node engines relaxed to `>=20.19` (box runs node v20.20.2; Vite 6 / Nest 11
