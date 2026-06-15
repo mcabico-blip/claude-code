@@ -10,6 +10,7 @@ import { DocTrackingService } from '../pillars/doc-tracking/doc-tracking.service
 import { DEPARTMENTS } from '../modules/dept/dept.module';
 import { EngineeringModule } from '../modules/engineering/engineering.module';
 import { PayItemEntity, ProjectEntity } from '../modules/engineering/entities';
+import { EquipmentModule, EquipmentService } from '../modules/equipment/equipment.module';
 import { ItModule, ItService } from '../modules/it/it.module';
 import { PropertyModule, PropertyService } from '../modules/property/property.module';
 import { QuantityModule, QuantityService } from '../modules/quantity/quantity.module';
@@ -30,6 +31,7 @@ export class SeedService implements OnApplicationBootstrap {
     private readonly records: RecordsService,
     private readonly it: ItService,
     private readonly quantity: QuantityService,
+    private readonly equipment: EquipmentService,
     @InjectRepository(PayItemEntity) private readonly payItems: Repository<PayItemEntity>,
     @InjectRepository(ProjectEntity) private readonly projects: Repository<ProjectEntity>,
     @InjectRepository(InsightEntity) private readonly insights: Repository<InsightEntity>,
@@ -145,13 +147,15 @@ export class SeedService implements OnApplicationBootstrap {
     await this.records.seed('seed');
     await this.it.seed(ceoClaims);
     await this.quantity.seed();
+    const pkg05 = await this.projects.findOne({ where: { code: 'PKG-05' } });
+    if (pkg05) await this.equipment.seed(ceoClaims, pkg05.id);
 
     this.log.log('seed complete — ceo@ubi.ph/ceo123, admin/vpo/pm/pe, + dept heads head-<dept>@ubi.ph/head123');
   }
 }
 
 @Module({
-  imports: [DocTrackingModule, EngineeringModule, PropertyModule, RecordsModule, ItModule, QuantityModule],
+  imports: [DocTrackingModule, EngineeringModule, PropertyModule, RecordsModule, ItModule, QuantityModule, EquipmentModule],
   providers: [SeedService],
 })
 export class SeedModule {}
