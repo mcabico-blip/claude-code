@@ -49,23 +49,31 @@ export class AuthService {
     email: string;
     name: string;
     password?: string;
+    /** Pre-computed bcrypt hash — force-applied (rotation), overrides password. */
+    passwordHash?: string;
     claims: string[];
     isField?: boolean;
     entity?: 'UBI' | 'OMEGA';
   }): Promise<UserEntity> {
     const existing = await this.findByEmail(input.email);
     if (existing) {
+      let changed = false;
       // Keep the demo display name in sync with the seed (idempotent).
       if (input.name && existing.name !== input.name) {
         existing.name = input.name;
-        return this.users.save(existing);
+        changed = true;
       }
-      return existing;
+      // Force-rotate the password to the managed hash when it differs.
+      if (input.passwordHash && existing.passwordHash !== input.passwordHash) {
+        existing.passwordHash = input.passwordHash;
+        changed = true;
+      }
+      return changed ? this.users.save(existing) : existing;
     }
     const user = this.users.create({
       email: input.email.toLowerCase(),
       name: input.name,
-      passwordHash: input.password ? await bcrypt.hash(input.password, 10) : null,
+      passwordHash: input.passwordHash ?? (input.password ? await bcrypt.hash(input.password, 10) : null),
       claims: input.claims,
       isField: input.isField ?? false,
       entity: input.entity ?? 'UBI',

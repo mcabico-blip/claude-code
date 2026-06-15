@@ -16,9 +16,9 @@ const DEPT_HEADS = [
   'it', 'records', 'clinic', 'admin', 'hr', 'property', 'finance',
 ];
 
-// POC/demo phase: show the tap-to-login chips everywhere so anyone can demo
-// (data is fake). The day this goes live for real, set VITE_HIDE_DEMO_LOGINS=true.
-const SHOW_DEMOS = import.meta.env.VITE_HIDE_DEMO_LOGINS !== 'true';
+// Real data now: demo tap-to-login chips are OFF in production (only shown in
+// local dev, or if explicitly opted in with VITE_SHOW_DEMO_LOGINS=true).
+const SHOW_DEMOS = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_LOGINS === 'true';
 
 export default function Login() {
   const [email, setEmail] = useState('');
