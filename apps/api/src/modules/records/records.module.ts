@@ -15,6 +15,8 @@ import { Column, Entity, Index, Repository } from 'typeorm';
 import { BaseAppEntity } from '../../common/base.entity';
 import { CurrentUser, hasClaim } from '../../common/rbac';
 import { ReadModelRegistry } from '../../pillars/ai-layer/read-model.registry';
+import { DocTrackingModule } from '../../pillars/doc-tracking/doc-tracking.module';
+import { DocTrackingService } from '../../pillars/doc-tracking/doc-tracking.service';
 import { ExpiryService } from '../../shared/expiry/expiry.module';
 
 /** Vehicle registration / insurance / stamps with expiry. */
@@ -76,10 +78,17 @@ export class RecordsService implements OnModuleInit {
     @InjectRepository(VehicleDocEntity) private readonly vdocs: Repository<VehicleDocEntity>,
     @InjectRepository(PhysicalLocationEntity) private readonly locs: Repository<PhysicalLocationEntity>,
     private readonly expiry: ExpiryService,
+    private readonly docs: DocTrackingService,
     private readonly registry: ReadModelRegistry,
   ) {}
 
   onModuleInit(): void {
+    // Records is the home of Document Tracking (Pillar 2) — it monitors the
+    // company-wide document registry (Finance is only a consumer).
+    this.registry.register(
+      { key: 'records.documents', module: 'records', title: 'Document registry & movement', description: 'Every tracked document: holder, location, status, history.' },
+      () => this.docs.list(),
+    );
     this.registry.register(
       { key: 'records.expiry', module: 'records', title: 'Expiring documents', description: 'Vehicle reg/insurance/stamps + tracked items within 30 days.' },
       () => this.upcoming(),
@@ -94,6 +103,10 @@ export class RecordsService implements OnModuleInit {
       },
       (user) => this.indexFor(user),
     );
+  }
+
+  documents(): ReturnType<DocTrackingService['list']> {
+    return this.docs.list();
   }
 
   async upcoming(): Promise<Array<{ title: string; kind: string; expiresOn: string; daysLeft: number }>> {
@@ -180,6 +193,11 @@ export class RecordsService implements OnModuleInit {
 export class RecordsController {
   constructor(private readonly svc: RecordsService) {}
 
+  @Get('documents')
+  documents(): Promise<unknown> {
+    return this.svc.documents();
+  }
+
   @Get('expiry')
   expiry(): Promise<unknown> {
     return this.svc.upcoming();
@@ -202,7 +220,7 @@ export class RecordsController {
 }
 
 @Module({
-  imports: [TypeOrmModule.forFeature([VehicleDocEntity, PhysicalLocationEntity])],
+  imports: [TypeOrmModule.forFeature([VehicleDocEntity, PhysicalLocationEntity]), DocTrackingModule],
   controllers: [RecordsController],
   providers: [RecordsService],
   exports: [RecordsService],

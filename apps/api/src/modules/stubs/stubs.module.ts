@@ -111,16 +111,14 @@ export class StubReadModelsService implements OnModuleInit {
       {
         key: 'finance.doc-flow',
         module: 'finance',
-        title: 'Document batches in motion',
-        description: 'Where is this paper now — batches to cashier, incoming from Records.',
+        title: 'Documents with Finance (batches to cashier)',
+        description: "Finance is a consumer of Document Tracking — only the docs it currently holds or is batching. The registry itself is monitored by Records.",
       },
       async () => {
         const docs = await this.docs.list();
-        return {
-          inTransit: docs.filter((d) => d.status === 'in-transit').length,
-          withFinance: docs.filter((d) => d.currentHolder.toLowerCase().includes('finance')).length,
-          recent: docs.slice(0, 10),
-        };
+        return docs.filter(
+          (d) => d.currentHolder.toLowerCase().includes('finance') || d.currentLocation.toLowerCase().includes('cashier'),
+        );
       },
     );
   }

@@ -26,7 +26,7 @@ export const DEPARTMENTS: DeptDef[] = [
   { slug: 'mqc', label: 'MQC', readModelKey: 'mqc.certs', monitoringTitle: 'Test & certificate queue', cameraId: 'CAM-MQC-01', headEmail: 'head-mqc@ubi.ph', headName: 'Engr. P. Cruz' },
   { slug: 'audit', label: 'Audit', readModelKey: 'audit.exceptions', monitoringTitle: 'Exception / investigation register', cameraId: 'CAM-AUD-01', headEmail: 'head-audit@ubi.ph', headName: 'C. Domingo' },
   { slug: 'it', label: 'IT', readModelKey: 'it.capacity', monitoringTitle: 'Capacity, devices & helpdesk', cameraId: 'CAM-IT-01', headEmail: 'head-it@ubi.ph', headName: 'Marvin (IT Head)' },
-  { slug: 'records', label: 'Records', readModelKey: 'records.expiry', monitoringTitle: 'Expiring documents & registry', cameraId: 'CAM-REC-01', headEmail: 'head-records@ubi.ph', headName: 'R. Bautista' },
+  { slug: 'records', label: 'Records', readModelKey: 'records.documents', monitoringTitle: 'Document registry & movement', cameraId: 'CAM-REC-01', headEmail: 'head-records@ubi.ph', headName: 'R. Bautista' },
   { slug: 'clinic', label: 'Clinic', readModelKey: 'clinic.aggregate', monitoringTitle: 'Aggregate health (isolated)', cameraId: 'CAM-CLN-01', headEmail: 'head-clinic@ubi.ph', headName: 'Dr. S. Lim' },
   { slug: 'admin', label: 'Admin / OHS', readModelKey: 'admin.tickets', monitoringTitle: 'Inquiries, OHS & dispensing', cameraId: 'CAM-ADM-01', headEmail: 'head-admin@ubi.ph', headName: 'G. Flores' },
   { slug: 'hr', label: 'HR', readModelKey: 'hr.hours', monitoringTitle: 'Hours computation runs', cameraId: 'CAM-HR-01', headEmail: 'head-hr@ubi.ph', headName: 'J. Aquino' },
