@@ -62,6 +62,14 @@ export default function ManCom() {
               />
             </div>
             <div className="kpi">
+              <div className="lab">Accomplishment</div>
+              <div className="val">
+                {(k.accomplishmentPct * 100).toFixed(1)}%
+                <span className="d-up">₱{(k.accomplishmentMonth / 1e6).toFixed(1)}M mo</span>
+              </div>
+              <div className="sub">in-house, from QE weekly entries</div>
+            </div>
+            <div className="kpi">
               <div className="lab">Avg slippage</div>
               <div className="val">
                 {k.avgSlippagePct}%
@@ -123,6 +131,26 @@ export default function ManCom() {
                           <span className="muted">—</span>
                         )}
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="card">
+              <div className="ph">
+                <b>Quantity — top accomplishment this month</b>
+                <span className="src">SRC · engineering.quantity</span>
+              </div>
+              <table className="tbl">
+                <thead><tr><th>Project</th><th>PE</th><th>To-date</th><th>This month</th></tr></thead>
+                <tbody>
+                  {snap.quantityTop.map((q) => (
+                    <tr key={q.code}>
+                      <td><b>{q.code}</b></td>
+                      <td>{q.pe}</td>
+                      <td><span className={`st ${q.pct < 0.85 ? 'st-warn' : 'st-ok'}`}>{(q.pct * 100).toFixed(0)}%</span></td>
+                      <td>₱{(q.thisMonth / 1e6).toFixed(2)}M</td>
                     </tr>
                   ))}
                 </tbody>

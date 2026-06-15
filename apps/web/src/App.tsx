@@ -13,6 +13,9 @@ import Login from './pages/Login';
 import ManCom from './pages/ManCom';
 import PmsScheduler from './pages/PmsScheduler';
 import Property from './pages/Property';
+import QuantityEntry from './pages/QuantityEntry';
+import QuantityHead from './pages/QuantityHead';
+import QuantityProjection from './pages/QuantityProjection';
 import Records from './pages/Records';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
@@ -33,6 +36,9 @@ export default function App() {
         <Route path="/approvals" element={<Approvals />} />
         <Route path="/docs" element={<Docs />} />
         <Route path="/engineering" element={<Engineering />} />
+        <Route path="/quantity" element={<QuantityEntry />} />
+        <Route path="/quantity/projection" element={<QuantityProjection />} />
+        <Route path="/quantity/head" element={<QuantityHead />} />
         <Route path="/property" element={<Property />} />
         <Route path="/records" element={<Records />} />
         <Route path="/it" element={<It />} />

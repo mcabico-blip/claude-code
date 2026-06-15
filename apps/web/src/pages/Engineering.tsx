@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import type { MaterialsSchedule, PayItem, Project } from '@ubi/types';
 import { api, getUser, hasClaim } from '../api';
 import { SheetBar } from '../ui';
@@ -43,6 +44,11 @@ export default function Engineering() {
   return (
     <>
       <SheetBar sheet="ENG-06" title="Engineering — projects · pay items · schedules" note="AI pre-fills the weekly schedule; PE adjusts → PM → VPO → Procurement" />
+      <div className="spread mb">
+        <Link to="/quantity" className="btn sm pri">Quantity — weekly entry →</Link>
+        <Link to="/quantity/head" className="btn sm">Quantity head dashboard →</Link>
+        <Link to="/quantity/projection" className="btn sm">Projection & materials →</Link>
+      </div>
       {error && <div className="err">{error}</div>}
 
       <div className="grid2">
