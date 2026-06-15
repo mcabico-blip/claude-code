@@ -19,6 +19,18 @@ export class ProjectEntity extends BaseAppEntity {
 
   @Column({ name: 'slippage_pct', type: 'real', default: 0 })
   slippagePct: number;
+
+  /** In-house contract amount — denominator for accomplishment %. */
+  @Column({ name: 'inhouse_amount', type: 'double precision', default: 0 })
+  inhouseAmount: number;
+
+  /** Project engineer / person-in-charge onsite. */
+  @Column({ name: 'pe', type: 'varchar', default: '' })
+  pe: string;
+
+  /** Accomplishment carried in before the system started (so % + to-date are right). */
+  @Column({ name: 'prior_accomplished', type: 'double precision', default: 0 })
+  priorAccomplished: number;
 }
 
 /** Master DPWH Blue Book pay-item library — one library, reused everywhere. */
