@@ -12,6 +12,10 @@ export interface ManComKpis {
   projectedSlippagePct: number | null;
   openExceptions: number;
   escalatedExceptions: number;
+  /** Overall in-house accomplishment (0..1) from Quantity weekly rollup. */
+  accomplishmentPct: number;
+  /** ₱ accomplished this month across all projects (Quantity rollup). */
+  accomplishmentMonth: number;
 }
 
 export interface TrendPoint {
@@ -43,6 +47,14 @@ export interface Insight {
   generatedBy: string;
 }
 
+export interface QuantityTop {
+  code: string;
+  name: string;
+  pe: string;
+  pct: number;
+  thisMonth: number;
+}
+
 export interface ManComSnapshot {
   asOf: string;
   kpis: ManComKpis;
@@ -51,6 +63,8 @@ export interface ManComSnapshot {
   flagged: FlaggedProject[];
   reportFeed: ReportStatus[];
   topInsights: Insight[];
+  /** Top projects by this-month accomplishment (Quantity rollup → CEO). */
+  quantityTop: QuantityTop[];
 }
 
 /** Pillar 3 — descriptor for a module's AI-queryable read model. */
