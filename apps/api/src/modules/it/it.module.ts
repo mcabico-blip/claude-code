@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Injectable, Module, OnModuleInit, Post } from '@nestjs/common';
+import { Body, Controller, Get, Injectable, Module, OnModuleInit, Param, Post, Query } from '@nestjs/common';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import type { UserClaims } from '@ubi/types';
-import { IsInt, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsArray, IsIn, IsInt, IsOptional, IsString, MinLength } from 'class-validator';
 import { Column, Entity, Index, Repository } from 'typeorm';
 import { BaseAppEntity } from '../../common/base.entity';
 import { CurrentUser } from '../../common/rbac';
@@ -19,14 +19,19 @@ export class DeviceEntity extends BaseAppEntity {
   @Column({ name: 'detail', type: 'varchar', nullable: true }) detail: string | null;
 }
 
+export type PmsStatus = 'scheduled' | 'in-progress' | 'done';
+
 /** Quarterly preventive-maintenance schedule, auto-built from Property assets. */
 @Entity('it_pms')
 export class PmsEntity extends BaseAppEntity {
   @Index() @Column({ name: 'asset_qr' }) assetQr: string;
   @Column() assetType: string;
-  @Column() quarter: string; // e.g. 2026-Q2
+  @Column({ default: 'General' }) category: string;
+  @Index() @Column() quarter: string; // e.g. 2026-Q2
   @Column({ name: 'due_on', type: 'date' }) dueOn: string;
-  @Column({ type: 'varchar', default: 'scheduled' }) status: 'scheduled' | 'done';
+  @Column({ type: 'varchar', default: 'scheduled' }) status: PmsStatus;
+  @Column({ type: 'varchar', nullable: true }) tech: string | null;
+  @Column({ name: 'completed_on', type: 'date', nullable: true }) completedOn: string | null;
 }
 
 /** DeskGuard v2 — self-reporting productivity (client-side OCR/counts posted). */
@@ -65,6 +70,18 @@ class DeskguardDto {
   @IsOptional() @IsInt() keystrokes?: number;
   @IsOptional() @IsInt() mouse?: number;
   @IsOptional() @IsInt() activeMinutes?: number;
+}
+
+class GeneratePmsDto {
+  /** e.g. 2026-Q3. Defaults to current quarter. */
+  @IsOptional() @IsString() quarter?: string;
+  /** Asset categories to include; empty = all PMS-eligible. */
+  @IsOptional() @IsArray() @IsString({ each: true }) categories?: string[];
+}
+
+class PmsStatusDto {
+  @IsIn(['scheduled', 'in-progress', 'done']) status: PmsStatus;
+  @IsOptional() @IsString() tech?: string;
 }
 
 @Injectable()
@@ -112,28 +129,58 @@ export class ItService implements OnModuleInit {
   }
 
   listDevices(): Promise<DeviceEntity[]> { return this.devices.find({ order: { kind: 'ASC' } }); }
-  listPms(): Promise<PmsEntity[]> { return this.pms.find({ order: { dueOn: 'ASC' }, take: 200 }); }
   listEnv(): Promise<EnvReadingEntity[]> { return this.env.find({ order: { createdAt: 'DESC' }, take: 50 }); }
   listDeskguard(): Promise<DeskguardEntity[]> { return this.desk.find({ order: { createdAt: 'DESC' }, take: 100 }); }
+
+  listPms(quarter?: string): Promise<PmsEntity[]> {
+    return this.pms.find({ where: quarter ? { quarter } : {}, order: { dueOn: 'ASC' }, take: 500 });
+  }
+
+  pmsCategories(): Promise<Array<{ category: string; count: number }>> {
+    return this.property.categories();
+  }
+
+  async setPmsStatus(id: string, dto: { status: PmsStatus; tech?: string }): Promise<PmsEntity | null> {
+    const patch: Partial<PmsEntity> = { status: dto.status };
+    if (dto.tech !== undefined) patch.tech = dto.tech;
+    patch.completedOn = dto.status === 'done' ? new Date().toISOString().slice(0, 10) : null;
+    await this.pms.update(id, patch);
+    return this.pms.findOne({ where: { id } });
+  }
+
+  private currentQuarter(): string {
+    const n = new Date();
+    return `${n.getFullYear()}-Q${Math.floor(n.getMonth() / 3) + 1}`;
+  }
+
+  /** Due date = 28th of the last month of the quarter. */
+  private quarterDue(quarter: string): string {
+    const [yStr, qStr] = quarter.split('-Q');
+    const year = Number(yStr);
+    const q = Number(qStr);
+    return new Date(year, q * 3 - 1, 28).toISOString().slice(0, 10);
+  }
 
   addDevice(user: UserClaims, dto: DeviceDto): Promise<DeviceEntity> {
     return this.devices.save(this.devices.create({ ...dto, status: 'up', createdBy: user.email }));
   }
 
-  /** Auto-generate quarterly PMS from active Property assets (idempotent/quarter). */
-  async generatePms(user: UserClaims): Promise<{ created: number; quarter: string }> {
-    const now = new Date();
-    const q = `${now.getFullYear()}-Q${Math.floor(now.getMonth() / 3) + 1}`;
-    const assets = await this.property.pmsEligible();
+  /** Generate quarterly PMS for selected asset categories (idempotent/quarter). */
+  async generatePms(
+    user: UserClaims,
+    opts: { quarter?: string; categories?: string[] } = {},
+  ): Promise<{ created: number; quarter: string }> {
+    const q = opts.quarter ?? this.currentQuarter();
+    const dueOn = this.quarterDue(q);
+    const assets = await this.property.pmsEligibleByCategories(opts.categories ?? []);
     let created = 0;
     for (const a of assets) {
       const exists = await this.pms.findOne({ where: { assetQr: a.qr, quarter: q } });
       if (exists) continue;
-      const due = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3 + 2, 28);
       await this.pms.save(
         this.pms.create({
-          assetQr: a.qr, assetType: a.type, quarter: q,
-          dueOn: due.toISOString().slice(0, 10), status: 'scheduled', createdBy: user?.email ?? 'system',
+          assetQr: a.qr, assetType: a.type, category: a.category, quarter: q,
+          dueOn, status: 'scheduled', tech: null, completedOn: null, createdBy: user?.email ?? 'system',
         }),
       );
       created += 1;
@@ -171,7 +218,20 @@ export class ItService implements OnModuleInit {
         this.desk.create({ person: 'Encoder — Cruz', topApp: 'Acumatica', kpiActivity: 'DR encoding', keystrokes: 14200, mouse: 3100, activeMinutes: 372, day: new Date().toISOString().slice(0, 10), createdBy: 'seed' }),
       ]);
     }
-    await this.generatePms(user);
+    // Seed current + previous quarter so all PMS views have content.
+    const now = new Date();
+    const y = now.getFullYear();
+    const curQ = Math.floor(now.getMonth() / 3) + 1;
+    await this.generatePms(user, { quarter: `${y}-Q${curQ}` });
+    if (curQ > 1) await this.generatePms(user, { quarter: `${y}-Q${curQ - 1}` });
+
+    // Give a few items tech + status so kanban/calendar/list aren't all "scheduled".
+    const sample = await this.pms.find({ order: { dueOn: 'ASC' }, take: 4 });
+    const techs = ['Tech — Reyes', 'Tech — Santos'];
+    for (let i = 0; i < sample.length; i++) {
+      const s = i === 0 ? 'done' : i === 1 ? 'in-progress' : 'scheduled';
+      await this.setPmsStatus(sample[i].id, { status: s as PmsStatus, tech: techs[i % 2] });
+    }
   }
 }
 
@@ -181,13 +241,20 @@ export class ItController {
 
   @Get('capacity') capacity(): unknown { return this.svc.capacity(); }
   @Get('devices') devices(): Promise<DeviceEntity[]> { return this.svc.listDevices(); }
-  @Get('pms') pmsList(): Promise<PmsEntity[]> { return this.svc.listPms(); }
   @Get('env') env(): Promise<EnvReadingEntity[]> { return this.svc.listEnv(); }
   @Get('deskguard/policy') policy(): { consent: string } { return { consent: DESKGUARD_CONSENT }; }
   @Get('deskguard') deskguard(): Promise<DeskguardEntity[]> { return this.svc.listDeskguard(); }
 
+  @Get('pms') pmsList(@Query('quarter') quarter?: string): Promise<PmsEntity[]> { return this.svc.listPms(quarter); }
+  @Get('pms/categories') pmsCats(): Promise<Array<{ category: string; count: number }>> { return this.svc.pmsCategories(); }
+  @Post('pms/generate') gen(@CurrentUser() u: UserClaims, @Body() dto: GeneratePmsDto): Promise<{ created: number; quarter: string }> {
+    return this.svc.generatePms(u, { quarter: dto.quarter, categories: dto.categories });
+  }
+  @Post('pms/:id/status') setStatus(@Param('id') id: string, @Body() dto: PmsStatusDto): Promise<PmsEntity | null> {
+    return this.svc.setPmsStatus(id, dto);
+  }
+
   @Post('devices') addDevice(@CurrentUser() u: UserClaims, @Body() dto: DeviceDto): Promise<DeviceEntity> { return this.svc.addDevice(u, dto); }
-  @Post('pms/generate') gen(@CurrentUser() u: UserClaims): Promise<{ created: number; quarter: string }> { return this.svc.generatePms(u); }
   @Post('deskguard') post(@CurrentUser() u: UserClaims, @Body() dto: DeskguardDto): Promise<DeskguardEntity> { return this.svc.postDeskguard(u, dto); }
 }
 
