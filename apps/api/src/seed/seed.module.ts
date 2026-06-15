@@ -43,9 +43,9 @@ export class SeedService implements OnApplicationBootstrap {
       this.log.log('SEED_DEMO != true — skipping demo seed');
       return;
     }
-    if ((await this.payItems.count()) > 0) return;
-    this.log.log('empty database — seeding demo data');
 
+    // Accounts are idempotent (ensureUser returns existing) — run every boot so
+    // newly-added dept-head accounts also backfill onto an existing demo DB.
     await this.auth.ensureUser({ email: 'admin@ubi.ph', name: 'Suite Admin', password: 'admin123', claims: ['role:admin'] });
     const ceo = await this.auth.ensureUser({ email: 'ceo@ubi.ph', name: 'E. Castillo', password: 'ceo123', claims: ['role:ceo'] });
     await this.auth.ensureUser({ email: 'vpo@ubi.ph', name: 'VPO Office', password: 'vpo123', claims: ['role:vpo', 'dept:operations'] });
@@ -55,94 +55,92 @@ export class SeedService implements OnApplicationBootstrap {
       claims: ['role:pe', 'dept:engineering', 'scope:project-PKG-02'], isField: true,
     });
     await this.auth.ensureUser({ email: 'insights-agent@ubi.ph', name: 'Insights Agent (off-box)', password: 'agent123', claims: ['agent:insights'] });
-
-    // Department-head accounts — one per department, each scoped to its dept.
-    // They land on their own standard department dashboard.
     for (const d of DEPARTMENTS) {
       await this.auth.ensureUser({
-        email: d.headEmail,
-        name: d.headName,
-        password: 'head123',
+        email: d.headEmail, name: d.headName, password: 'head123',
         claims: ['role:manager', `dept:${d.slug}`],
       });
     }
-
-    await this.payItems.save(
-      [
-        { itemNo: '100(3)', description: 'Clearing and grubbing', unit: 'ha' },
-        { itemNo: '200', description: 'Aggregate subbase course', unit: 'm³' },
-        { itemNo: '300(1)', description: 'Aggregate base course', unit: 'm³' },
-        { itemNo: '311(1)c', description: 'PCC Pavement (plain) 230mm', unit: 'm²' },
-        { itemNo: '404(1)', description: 'Reinforcing steel, Grade 40', unit: 'kg' },
-        { itemNo: 'SPL-1', description: 'Special item — project signage', unit: 'l.s.' },
-      ].map((p) => this.payItems.create({ ...p, createdBy: 'seed' })),
-    );
-
-    const packages: Array<[string, string, number]> = [
-      ['PKG-02', 'Iligan Coastal Diversion', -1.2],
-      ['PKG-05', 'Daang Maharlika Rehab K1440', -4.6],
-      ['PKG-11', 'Bukidnon Boundary Rd', 3.1],
-      ['PKG-03', 'Cagayan Valley Access Rd', 0.4],
-      ['PKG-07', 'Misamis Slope Protection', -0.6],
-      ['PKG-09', 'Tagoloan Bridge Approach', 1.9],
-    ];
-    await this.projects.save(
-      packages.map(([code, name, slip], i) =>
-        this.projects.create({
-          code,
-          name,
-          contractNo: `26${String(i + 1).padStart(2, '0')}-DPWH-X`,
-          status: 'active',
-          slippagePct: slip,
-          createdBy: 'seed',
-        }),
-      ),
-    );
-
-    await this.insights.save(
-      [
-        {
-          severity: 'critical' as const,
-          title: 'Pkg 5 trends to −6.2% slippage by July',
-          body:
-            'Cement deliveries from Solid Mix Corp arrived late 3 consecutive weeks (avg 2.4 days). ' +
-            'PCCP pours on Item 311 are 1,180 m² behind program; the weekly SWA gap has widened each week since wk 22.',
-          evidence: ['procurement.dr-log wk22–24', 'engineering.swa wk22–24', 'survey.volumes Δ STA 4+200–5+600'],
-          actions: ['view-evidence', 'send-to-vpo', 'raise-audit-exception'],
-        },
-        {
-          severity: 'warning' as const,
-          title: 'Billing No. 7 (Pkg 2) blocked by MQC certs',
-          body: '2 material certificates (Item 311 beam tests) pending 6 days. Billing draft is otherwise complete.',
-          evidence: ['mqc.certs', 'engineering.billing №7'],
-          actions: ['view-evidence', 'nudge-mqc'],
-        },
-        {
-          severity: 'warning' as const,
-          title: '4 vehicle registrations expire within 15 days',
-          body: '3 dump trucks (Pkg 5 haul fleet) + 1 service vehicle. Renewal lead time averages 9 days.',
-          evidence: ['records.expiry'],
-          actions: ['view-list', 'notify-records'],
-        },
-        {
-          severity: 'positive' as const,
-          title: 'Pkg 11 ahead of plan 6 consecutive weeks',
-          body: '+3.1% and climbing; subbase complete 3 weeks early. Consider advancing Billing No. 4.',
-          evidence: ['engineering.swa', 'operations.health'],
-          actions: ['view-project'],
-        },
-      ].map((i) => this.insights.create({ ...i, generatedBy: 'seed (off-box agent pattern)', createdBy: 'seed' })),
-    );
-
     const ceoClaims: UserClaims = this.auth.toClaims(ceo);
-    const doc = await this.docs.create(ceoClaims, {
-      type: 'transmittal',
-      title: 'Billing No. 7 — attachments batch (PKG-02)',
-      location: 'HQ · Engineering 3F',
-    });
-    await this.docs.transmit(ceoClaims, doc.code, 'Finance — J. Ramos', 'for cashier batching');
 
-    // Real department modules — assets, vehicle docs, physical index, IT.
+    // Core reference data (pay items, projects, demo insights, a sample doc) —
+    // only on a fresh DB.
+    if ((await this.payItems.count()) === 0) {
+      this.log.log('empty database — seeding core reference data');
+      await this.payItems.save(
+        [
+          { itemNo: '100(3)', description: 'Clearing and grubbing', unit: 'ha' },
+          { itemNo: '200', description: 'Aggregate subbase course', unit: 'm³' },
+          { itemNo: '300(1)', description: 'Aggregate base course', unit: 'm³' },
+          { itemNo: '311(1)c', description: 'PCC Pavement (plain) 230mm', unit: 'm²' },
+          { itemNo: '404(1)', description: 'Reinforcing steel, Grade 40', unit: 'kg' },
+          { itemNo: 'SPL-1', description: 'Special item — project signage', unit: 'l.s.' },
+        ].map((p) => this.payItems.create({ ...p, createdBy: 'seed' })),
+      );
+
+      const packages: Array<[string, string, number]> = [
+        ['PKG-02', 'Iligan Coastal Diversion', -1.2],
+        ['PKG-05', 'Daang Maharlika Rehab K1440', -4.6],
+        ['PKG-11', 'Bukidnon Boundary Rd', 3.1],
+        ['PKG-03', 'Cagayan Valley Access Rd', 0.4],
+        ['PKG-07', 'Misamis Slope Protection', -0.6],
+        ['PKG-09', 'Tagoloan Bridge Approach', 1.9],
+      ];
+      await this.projects.save(
+        packages.map(([code, name, slip], i) =>
+          this.projects.create({
+            code, name, contractNo: `26${String(i + 1).padStart(2, '0')}-DPWH-X`,
+            status: 'active', slippagePct: slip, createdBy: 'seed',
+          }),
+        ),
+      );
+
+      await this.insights.save(
+        [
+          {
+            severity: 'critical' as const,
+            title: 'Pkg 5 trends to −6.2% slippage by July',
+            body:
+              'Cement deliveries from Solid Mix Corp arrived late 3 consecutive weeks (avg 2.4 days). ' +
+              'PCCP pours on Item 311 are 1,180 m² behind program; the weekly SWA gap has widened each week since wk 22.',
+            evidence: ['procurement.dr-log wk22–24', 'engineering.swa wk22–24', 'survey.volumes Δ STA 4+200–5+600'],
+            actions: ['view-evidence', 'send-to-vpo', 'raise-audit-exception'],
+          },
+          {
+            severity: 'warning' as const,
+            title: 'Billing No. 7 (Pkg 2) blocked by MQC certs',
+            body: '2 material certificates (Item 311 beam tests) pending 6 days. Billing draft is otherwise complete.',
+            evidence: ['mqc.certs', 'engineering.billing №7'],
+            actions: ['view-evidence', 'nudge-mqc'],
+          },
+          {
+            severity: 'warning' as const,
+            title: '4 vehicle registrations expire within 15 days',
+            body: '3 dump trucks (Pkg 5 haul fleet) + 1 service vehicle. Renewal lead time averages 9 days.',
+            evidence: ['records.expiry'],
+            actions: ['view-list', 'notify-records'],
+          },
+          {
+            severity: 'positive' as const,
+            title: 'Pkg 11 ahead of plan 6 consecutive weeks',
+            body: '+3.1% and climbing; subbase complete 3 weeks early. Consider advancing Billing No. 4.',
+            evidence: ['engineering.swa', 'operations.health'],
+            actions: ['view-project'],
+          },
+        ].map((i) => this.insights.create({ ...i, generatedBy: 'seed (off-box agent pattern)', createdBy: 'seed' })),
+      );
+
+      const doc = await this.docs.create(ceoClaims, {
+        type: 'transmittal',
+        title: 'Billing No. 7 — attachments batch (PKG-02)',
+        location: 'HQ · Engineering 3F',
+      });
+      await this.docs.transmit(ceoClaims, doc.code, 'Finance — J. Ramos', 'for cashier batching');
+    }
+
+    // Module data — each seed is INDEPENDENTLY idempotent, so always run them.
+    // This backfills newly-deployed modules (Quantity in-house amounts, Property
+    // assets, IT/Records/Equipment) onto an existing demo DB — no DB drop needed.
     await this.property.seed('seed');
     await this.records.seed('seed');
     await this.it.seed(ceoClaims);
