@@ -16,9 +16,9 @@ const DEPT_HEADS = [
   'it', 'records', 'clinic', 'admin', 'hr', 'property', 'finance',
 ];
 
-// Demo autofill chips advertise working credentials — never show them on a
-// production login page. Dev shows them; prod only if explicitly opted in.
-const SHOW_DEMOS = import.meta.env.DEV || import.meta.env.VITE_SHOW_DEMO_LOGINS === 'true';
+// POC/demo phase: show the tap-to-login chips everywhere so anyone can demo
+// (data is fake). The day this goes live for real, set VITE_HIDE_DEMO_LOGINS=true.
+const SHOW_DEMOS = import.meta.env.VITE_HIDE_DEMO_LOGINS !== 'true';
 
 export default function Login() {
   const [email, setEmail] = useState('');
