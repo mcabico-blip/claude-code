@@ -11,6 +11,7 @@ import Insights from './pages/Insights';
 import It from './pages/It';
 import Login from './pages/Login';
 import ManCom from './pages/ManCom';
+import PmsScheduler from './pages/PmsScheduler';
 import Property from './pages/Property';
 import Records from './pages/Records';
 
@@ -35,6 +36,7 @@ export default function App() {
         <Route path="/property" element={<Property />} />
         <Route path="/records" element={<Records />} />
         <Route path="/it" element={<It />} />
+        <Route path="/it/pms" element={<PmsScheduler />} />
         <Route path="/dept/:slug" element={<Dept />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -17,7 +17,7 @@ const TOOLS: Record<string, { path: string; label: string }> = {
   engineering: { path: '/engineering', label: 'Open Engineering tools — projects · materials schedule' },
   property: { path: '/property', label: 'Open Property tools — scan · re-custody · attest' },
   records: { path: '/records', label: 'Open Records tools — expiry · vehicle docs · physical index' },
-  it: { path: '/it', label: 'Open IT control room — devices · PMS · DeskGuard · env' },
+  it: { path: '/it', label: 'Open IT control room — devices · PMS scheduler · DeskGuard · env' },
 };
 
 function Value({ v }: { v: unknown }) {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../api';
 import { Loader, SheetBar } from '../ui';
 
@@ -70,18 +71,11 @@ export default function It() {
       </div>
 
       <div className="card mb">
-        <div className="ph"><b>Preventive maintenance (PMS)</b><span className="src">SRC · it.pms · auto-built from Property assets</span></div>
-        <table className="tbl">
-          <thead><tr><th>Asset</th><th>Type</th><th>Quarter</th><th>Due</th><th>Status</th></tr></thead>
-          <tbody>
-            {pms.map((p) => (
-              <tr key={p.id}>
-                <td><code>{p.assetQr}</code></td><td>{p.assetType}</td><td>{p.quarter}</td><td>{p.dueOn}</td>
-                <td><span className={`st ${p.status === 'done' ? 'st-ok' : 'st-info'}`}>{p.status}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="ph"><b>Preventive maintenance (PMS)</b><span className="src">SRC · it.pms</span></div>
+        <div className="spread">
+          <span className="muted">{pms.length} scheduled · {pms.filter((p) => p.status === 'done').length} done across quarters</span>
+          <Link to="/it/pms" className="btn pri sm right">Open PMS scheduler — Q1–Q4 · list · kanban · calendar →</Link>
+        </div>
       </div>
 
       <div className="card">
