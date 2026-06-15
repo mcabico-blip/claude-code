@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { clearSession, getUser, hasClaim } from './api';
+import AssistantFab from './AssistantFab';
 
 const departments = [
   ['engineering', 'Engineering'],
@@ -84,6 +85,7 @@ export default function Shell() {
       <main className="main">
         <Outlet />
       </main>
+      <AssistantFab />
     </div>
   );
 }
