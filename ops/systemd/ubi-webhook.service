@@ -14,7 +14,8 @@ Environment=PORT=8787
 # Put the secret in /etc/ubi-webhook.env (chmod 600), not here:
 EnvironmentFile=/etc/ubi-webhook.env
 Environment=PATH=/usr/local/bin:/usr/bin:/bin:/home/deploy/.local/bin
-ExecStart=/usr/bin/node ops/webhook-receiver.mjs
+# Run from OUTSIDE the repo (survives the deploy's `git reset --hard`).
+ExecStart=/usr/bin/node /opt/ubi-deploy/webhook-receiver.mjs
 Restart=always
 RestartSec=3
 

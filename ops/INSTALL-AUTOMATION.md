@@ -14,6 +14,20 @@ that user, and `claude` already authenticated for it.
 cd /srv/ubi
 cp ops/deploy-box.settings.json .claude/settings.json   # tool allowlist (ubi-edge restart, git, npm, psql, curl)
 ```
+
+## 0.5 Copy triggers OUTSIDE the repo (loop-guard survival)
+The deploy does `git reset --hard origin/production`, which would revert any
+in-repo trigger edits mid-run. So the systemd units run **guarded copies** from
+`/opt/ubi-deploy/`. Re-copy whenever these two files change in the repo.
+```bash
+sudo mkdir -p /opt/ubi-deploy
+sudo cp ops/wake-claude-deploy.sh ops/webhook-receiver.mjs /opt/ubi-deploy/
+sudo chmod +x /opt/ubi-deploy/wake-claude-deploy.sh
+```
+The wake script carries a **loop guard**: it never deploys when the tip commit is
+an `ops(deploy): …` status commit (otherwise each deploy's status push would
+re-trigger a deploy forever). Verify after install: a status-commit push must be
+skipped, a real change must deploy.
 The wake script uses `--permission-mode acceptEdits --allowedTools ...`; the
 allowlist must cover everything `DEPLOY.md` needs. If a deploy is denied a command,
 add it to the allowlist and note it in `for_cloud_claude:`.

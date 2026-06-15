@@ -16,6 +16,16 @@ git fetch origin "$BRANCH" --quiet
 TARGET="$(git rev-parse "origin/$BRANCH")"
 LAST="$(cat ops/.last_deployed 2>/dev/null || echo none)"
 
+# LOOP GUARD (critical): every successful deploy pushes an `ops(deploy): …`
+# status commit back to `production`. That push would itself re-fire the
+# webhook/timer → redeploy → push → forever. So: never deploy when the tip
+# commit is one of our own deploy-status commits. Runs for BOTH triggers
+# (before --force), because the webhook fires on the status push too.
+TIP_MSG="$(git log -1 --format=%s "origin/$BRANCH" 2>/dev/null || echo '')"
+case "$TIP_MSG" in
+  "ops(deploy):"*) echo "tip is our own deploy-status commit — skipping (loop guard)"; exit 0 ;;
+esac
+
 # --force (from webhook) skips the equality check; timer relies on it.
 if [ "${1:-}" != "--force" ] && [ "$TARGET" = "$LAST" ]; then
   exit 0   # nothing new — stay quiet

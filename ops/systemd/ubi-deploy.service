@@ -11,4 +11,6 @@ WorkingDirectory=/srv/ubi
 Environment=UBI_REPO=/srv/ubi
 # Ensure `claude` and `node` are on PATH for the service user:
 Environment=PATH=/usr/local/bin:/usr/bin:/bin:/home/deploy/.local/bin
-ExecStart=/usr/bin/env bash ops/wake-claude-deploy.sh
+# Run the trigger from OUTSIDE the repo so the deploy's `git reset --hard` can't
+# revert the loop guard mid-run. Copy it there in install step 0.5.
+ExecStart=/usr/bin/env bash /opt/ubi-deploy/wake-claude-deploy.sh
