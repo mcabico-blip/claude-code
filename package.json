@@ -17,6 +17,6 @@
     "typecheck": "npm run build:packages && npm run typecheck -w @ubi/api -w @ubi/web"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=20.19"
   }
 }

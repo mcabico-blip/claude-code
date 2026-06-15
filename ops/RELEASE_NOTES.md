@@ -8,6 +8,10 @@
 - (none — restart command, demo-chip gating, nginx sample applied to repo)
 
 ## Addressed from last DEPLOY_STATUS for_cloud_claude (2026-06-15)
+- ✅ Node engines relaxed to `>=20.19` (box runs node v20.20.2; Vite 6 / Nest 11
+  are fine on 20.19+) — kills the EBADENGINE warning, de-risks deploys.
+- ℹ️ Automation: the **timer** is localhost-only (NOT outward-facing) — safe to
+  install now. Only the webhook is inbound; treat it as opt-in later.
 - ✅ Restart command corrected to `systemctl restart ubi-edge` (DEPLOY.md §4 + allowlist).
 - ✅ Demo login chips now hidden in production builds (gated on `import.meta.env.DEV`
   or `VITE_SHOW_DEMO_LOGINS=true`) — prod login page no longer advertises creds.
