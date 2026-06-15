@@ -48,6 +48,8 @@ export default function Engineering() {
         <Link to="/quantity" className="btn sm pri">Quantity — weekly entry →</Link>
         <Link to="/quantity/head" className="btn sm">Quantity head dashboard →</Link>
         <Link to="/quantity/projection" className="btn sm">Projection & materials →</Link>
+        <Link to="/equipment" className="btn sm">Equipment schedule → Omega</Link>
+        <Link to="/procurement" className="btn sm">Procurement intake →</Link>
       </div>
       {error && <div className="err">{error}</div>}
 

@@ -6,12 +6,14 @@ import Ask from './pages/Ask';
 import Dept from './pages/Dept';
 import Docs from './pages/Docs';
 import Engineering from './pages/Engineering';
+import Equipment from './pages/Equipment';
 import Helpdesk from './pages/Helpdesk';
 import Insights from './pages/Insights';
 import It from './pages/It';
 import Login from './pages/Login';
 import ManCom from './pages/ManCom';
 import PmsScheduler from './pages/PmsScheduler';
+import Procurement from './pages/Procurement';
 import Property from './pages/Property';
 import QuantityEntry from './pages/QuantityEntry';
 import QuantityHead from './pages/QuantityHead';
@@ -39,6 +41,8 @@ export default function App() {
         <Route path="/quantity" element={<QuantityEntry />} />
         <Route path="/quantity/projection" element={<QuantityProjection />} />
         <Route path="/quantity/head" element={<QuantityHead />} />
+        <Route path="/equipment" element={<Equipment />} />
+        <Route path="/procurement" element={<Procurement />} />
         <Route path="/property" element={<Property />} />
         <Route path="/records" element={<Records />} />
         <Route path="/it" element={<It />} />

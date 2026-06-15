@@ -15,6 +15,7 @@ interface DeptDashboard {
 /** Departments with a dedicated tools page (deep workflows). */
 const TOOLS: Record<string, { path: string; label: string }> = {
   engineering: { path: '/engineering', label: 'Open Engineering tools — projects · materials schedule' },
+  procurement: { path: '/procurement', label: 'Open Procurement — materials intake · suppliers' },
   property: { path: '/property', label: 'Open Property tools — scan · re-custody · attest' },
   records: { path: '/records', label: 'Open Records tools — expiry · vehicle docs · physical index' },
   it: { path: '/it', label: 'Open IT control room — devices · PMS scheduler · DeskGuard · env' },
