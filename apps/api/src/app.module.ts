@@ -10,7 +10,9 @@ import { EngineeringModule } from './modules/engineering/engineering.module';
 import { EquipmentModule } from './modules/equipment/equipment.module';
 import { FleetModule } from './modules/fleet/fleet.module';
 import { ItModule } from './modules/it/it.module';
+import { MqcModule } from './modules/mqc/mqc.module';
 import { OperationsModule } from './modules/operations/operations.module';
+import { SurveyModule } from './modules/survey/survey.module';
 import { ProcurementModule } from './modules/procurement/procurement.module';
 import { PropertyModule } from './modules/property/property.module';
 import { QuantityModule } from './modules/quantity/quantity.module';
@@ -65,6 +67,8 @@ import { TicketingModule } from './shared/ticketing/ticketing.module';
     RecordsModule,
     ItModule,
     FleetModule,
+    SurveyModule,
+    MqcModule,
     DeptModule,
     StubsModule,
     CeoModule,

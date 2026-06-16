@@ -13,9 +13,11 @@ import { EngineeringModule } from '../modules/engineering/engineering.module';
 import { PayItemEntity, ProjectEntity } from '../modules/engineering/entities';
 import { EquipmentModule, EquipmentService } from '../modules/equipment/equipment.module';
 import { ItModule, ItService } from '../modules/it/it.module';
+import { MqcModule, MqcService } from '../modules/mqc/mqc.module';
 import { PropertyModule, PropertyService } from '../modules/property/property.module';
 import { QuantityModule, QuantityService } from '../modules/quantity/quantity.module';
 import { RecordsModule, RecordsService } from '../modules/records/records.module';
+import { SurveyModule, SurveyService } from '../modules/survey/survey.module';
 import { ExpiryService } from '../shared/expiry/expiry.module';
 
 /** Dev/demo seed — idempotent; runs only when the database is empty. */
@@ -33,6 +35,8 @@ export class SeedService implements OnApplicationBootstrap {
     private readonly it: ItService,
     private readonly quantity: QuantityService,
     private readonly equipment: EquipmentService,
+    private readonly survey: SurveyService,
+    private readonly mqc: MqcService,
     @InjectRepository(PayItemEntity) private readonly payItems: Repository<PayItemEntity>,
     @InjectRepository(ProjectEntity) private readonly projects: Repository<ProjectEntity>,
     @InjectRepository(InsightEntity) private readonly insights: Repository<InsightEntity>,
@@ -150,12 +154,63 @@ export class SeedService implements OnApplicationBootstrap {
     const pkg05 = await this.projects.findOne({ where: { code: 'PKG-05' } });
     if (pkg05) await this.equipment.seed(ceoClaims, pkg05.id);
 
+    await this.seedSurvey();
+    await this.seedMqc();
+
     this.log.log('seed complete — ceo@ubi.ph/ceo123, admin/vpo/pm/pe, + dept heads head-<dept>@ubi.ph/head123');
+  }
+
+  private async seedSurvey(): Promise<void> {
+    // Seed monthly survey measurements for PKG-02 and PKG-05 if none exist.
+    const existing = await this.survey.listByProject('PKG-02');
+    if (existing.length > 0) return;
+
+    const records = [
+      { projectId: 'PKG-02', period: '2026-01', stationStart: 'STA 0+000', stationEnd: 'STA 0+480', payItemNo: '311(1)c', volumeM3: 44200, type: 'cross-section' },
+      { projectId: 'PKG-02', period: '2026-02', stationStart: 'STA 0+480', stationEnd: 'STA 1+020', payItemNo: '311(1)c', volumeM3: 54100, type: 'cross-section' },
+      { projectId: 'PKG-02', period: '2026-03', stationStart: 'STA 1+020', stationEnd: 'STA 1+620', payItemNo: '311(1)c', volumeM3: 59300, type: 'cross-section' },
+      { projectId: 'PKG-02', period: '2026-04', stationStart: 'STA 1+620', stationEnd: 'STA 2+080', payItemNo: '311(1)c', volumeM3: 50000, type: 'cross-section' },
+      { projectId: 'PKG-02', period: '2026-05', stationStart: 'STA 2+080', stationEnd: 'STA 2+720', payItemNo: '311(1)c', volumeM3: 64400, type: 'cross-section' },
+      { projectId: 'PKG-02', period: '2026-06', stationStart: 'STA 2+720', stationEnd: 'STA 3+060', payItemNo: '311(1)c', volumeM3: 31000, type: 'cross-section' },
+      { projectId: 'PKG-05', period: '2026-05', stationStart: 'STA 4+200', stationEnd: 'STA 5+600', payItemNo: '200', volumeM3: 38800, type: 'as-built' },
+      { projectId: 'PKG-05', period: '2026-06', stationStart: 'STA 5+600', stationEnd: 'STA 6+200', payItemNo: '200', volumeM3: 21200, type: 'as-built' },
+    ];
+
+    for (const r of records) {
+      await this.survey.submit(r, 'seed');
+    }
+    this.log.log(`survey: seeded ${records.length} measurements`);
+  }
+
+  private async seedMqc(): Promise<void> {
+    const existing = await this.mqc.listTests('PKG-02');
+    if (existing.length > 0) return;
+
+    const tests = [
+      { projectId: 'PKG-02', payItemNo: '311(1)c', testType: 'Concrete beam (7-day)', result: 'pending', billingRef: 'Billing No. 7 / PKG-02', certId: 'MQC-2026-0712', testDate: new Date('2026-06-08') },
+      { projectId: 'PKG-02', payItemNo: '311(1)c', testType: 'Concrete beam (14-day)', result: 'pending', billingRef: 'Billing No. 7 / PKG-02', certId: 'MQC-2026-0713', testDate: new Date('2026-06-08') },
+      { projectId: 'PKG-02', payItemNo: '311(1)c', testType: 'Concrete beam (28-day)', result: 'passed', billingRef: 'Billing No. 6 / PKG-02', certId: 'MQC-2026-0688', testDate: new Date('2026-05-20'), labRef: 'LAB-0512' },
+      { projectId: 'PKG-05', payItemNo: '200', testType: 'Field density (nuclear)', result: 'passed', testDate: new Date('2026-05-28'), labRef: 'LAB-0498' },
+      { projectId: 'PKG-05', payItemNo: '200', testType: 'CBR laboratory', result: 'passed', testDate: new Date('2026-04-10'), labRef: 'LAB-0431' },
+    ];
+
+    for (const t of tests) {
+      await this.mqc.submitTest(t, 'seed');
+    }
+
+    const pours = [
+      { projectId: 'PKG-02', payItemNo: '311(1)c', station: 'STA 2+720', pourDate: new Date('2026-06-08'), mixDesign: 'Class A 40.7 MPa', volumeM3: 180.5, slumpMm: 75, airContentPct: 5.2 },
+      { projectId: 'PKG-02', payItemNo: '311(1)c', station: 'STA 2+840', pourDate: new Date('2026-06-10'), mixDesign: 'Class A 40.7 MPa', volumeM3: 165.0, slumpMm: 80, airContentPct: 4.9 },
+    ];
+    for (const p of pours) {
+      await this.mqc.submitPour(p, 'seed');
+    }
+    this.log.log(`mqc: seeded ${tests.length} tests, ${pours.length} pour logs`);
   }
 }
 
 @Module({
-  imports: [DocTrackingModule, EngineeringModule, PropertyModule, RecordsModule, ItModule, QuantityModule, EquipmentModule],
+  imports: [DocTrackingModule, EngineeringModule, PropertyModule, RecordsModule, ItModule, QuantityModule, EquipmentModule, SurveyModule, MqcModule],
   providers: [SeedService],
 })
 export class SeedModule {}

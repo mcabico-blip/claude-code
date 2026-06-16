@@ -13,8 +13,10 @@ import Insights from './pages/Insights';
 import It from './pages/It';
 import Login from './pages/Login';
 import ManCom from './pages/ManCom';
+import Mqc from './pages/Mqc';
 import PmsScheduler from './pages/PmsScheduler';
 import Procurement from './pages/Procurement';
+import Survey from './pages/Survey';
 import Property from './pages/Property';
 import QuantityEntry from './pages/QuantityEntry';
 import QuantityHead from './pages/QuantityHead';
@@ -48,6 +50,8 @@ export default function App() {
         <Route path="/records" element={<Records />} />
         <Route path="/it" element={<It />} />
         <Route path="/it/pms" element={<PmsScheduler />} />
+        <Route path="/survey" element={<Survey />} />
+        <Route path="/mqc" element={<Mqc />} />
         <Route path="/fleet" element={<Fleet />} />
         <Route path="/dept/:slug" element={<Dept />} />
       </Route>

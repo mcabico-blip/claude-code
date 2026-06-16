@@ -460,3 +460,16 @@ code { font-family: var(--mono); font-size: 0.9em; letter-spacing: -0.2px; }
 .bigstamp { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 30px 0 26px; text-align: center; }
 .bigstamp .stamp { font-size: 15px; padding: 8px 18px 7px; transform: rotate(-6deg); }
 .bigstamp code { font-size: 13px; }
+
+/* ── tab switcher ─────────────────────────────────────────────── */
+.tabs { display: flex; gap: 4px; }
+.tab-btn { background: none; border: 1.6px solid var(--ink); padding: 6px 18px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; cursor: pointer; color: var(--muted); transition: background 0.12s, color 0.12s; }
+.tab-btn.on { background: var(--ink); color: #fff; }
+.tab-btn:hover:not(.on) { background: var(--surface); color: var(--ink); }
+.badge-warn { display: inline-block; background: var(--orange); color: #fff; font-size: 9px; border-radius: 8px; padding: 0 5px; margin-left: 5px; vertical-align: middle; }
+
+/* ── form field helper ────────────────────────────────────────── */
+.field { display: flex; flex-direction: column; gap: 3px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); }
+.field .tin { min-width: 100px; }
+.ta-r { text-align: right; }
+.ta-c { text-align: center; }

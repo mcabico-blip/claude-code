@@ -1,5 +1,5 @@
 import { Controller, Get, Injectable, Module, OnModuleInit } from '@nestjs/common';
-import type { ReportStatus, TrendPoint } from '@ubi/types';
+import type { ReportStatus } from '@ubi/types';
 import { ReadModelRegistry } from '../../pillars/ai-layer/read-model.registry';
 import { DocTrackingService } from '../../pillars/doc-tracking/doc-tracking.service';
 import { DocTrackingModule } from '../../pillars/doc-tracking/doc-tracking.module';
@@ -23,36 +23,7 @@ export class StubReadModelsService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    this.registry.register(
-      {
-        key: 'survey.volumes',
-        module: 'survey',
-        title: 'Monthly survey volumes (m³ ×1000)',
-        description: 'Feeds ManCom consolidation; station/chainage indexed.',
-      },
-      (): TrendPoint[] => [
-        { period: 'Jan', plan: null, actual: 44, projected: null },
-        { period: 'Feb', plan: null, actual: 54, projected: null },
-        { period: 'Mar', plan: null, actual: 59, projected: null },
-        { period: 'Apr', plan: null, actual: 50, projected: null },
-        { period: 'May', plan: null, actual: 64, projected: null },
-        { period: 'Jun', plan: null, actual: 31, projected: null },
-        { period: 'Jul', plan: null, actual: null, projected: 61 },
-      ],
-    );
-
-    this.registry.register(
-      {
-        key: 'mqc.certs',
-        module: 'mqc',
-        title: 'Material certificates queue',
-        description: 'DPWH minimum testing per pay item; certs attach to billings.',
-      },
-      () => [
-        { certId: 'MQC-2026-0712', payItemNo: '311(1)c', test: 'Concrete beam (7-day)', status: 'pending', daysPending: 6, billing: 'Billing No. 7 / PKG-02' },
-        { certId: 'MQC-2026-0713', payItemNo: '311(1)c', test: 'Concrete beam (14-day)', status: 'pending', daysPending: 6, billing: 'Billing No. 7 / PKG-02' },
-      ],
-    );
+    // survey.volumes and mqc.certs are now owned by SurveyModule and MqcModule.
 
     this.registry.register(
       {
@@ -136,9 +107,7 @@ export class StubsController {
       : { error: `read model ${key} not registered` };
   }
 
-  // Real modules (it, records, property) own their own routes now.
-  @Get('survey/volumes') survey(): unknown { return this.query('survey.volumes'); }
-  @Get('mqc/certs') mqc(): unknown { return this.query('mqc.certs'); }
+  // it, records, property, survey, mqc own their own routes now.
   @Get('audit/exceptions') audit(): unknown { return this.query('audit.exceptions'); }
   @Get('clinic/aggregate') clinic(): unknown { return this.query('clinic.aggregate'); }
   @Get('hr/hours') hr(): unknown { return this.query('hr.hours'); }
