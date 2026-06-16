@@ -7,6 +7,24 @@ import { Chainage, Loader, SheetBar } from '../ui';
 
 const peso = (centavos: number) => `₱${(centavos / 100 / 1_000_000).toFixed(1)}M`;
 
+function FleetCard() {
+  const [s, setS] = useState<{ total: number; moving: number; stopped: number; noFix: number; configured: boolean } | null>(null);
+  useEffect(() => { api<typeof s>('/fleet/summary').then(setS).catch(() => {}); }, []);
+  if (!s) return null;
+  return (
+    <div className="card">
+      <div className="railh" style={{ marginBottom: 8 }}>Fleet (Cartrack) <Link to="/fleet" style={{ marginLeft: 'auto' }}>map →</Link></div>
+      <div className="spread" style={{ fontSize: 12 }}>
+        <span><b style={{ fontSize: 18 }}>{s.total}</b> vehicles</span>
+        <span className="st st-ok">{s.moving} moving</span>
+        <span className="st st-warn">{s.stopped} stopped</span>
+        {s.noFix > 0 && <span className="st st-bad">{s.noFix} no-fix</span>}
+      </div>
+      {!s.configured && <div className="muted" style={{ fontSize: 10, marginTop: 6 }}>demo — set Cartrack creds for live</div>}
+    </div>
+  );
+}
+
 export default function ManCom() {
   const [snap, setSnap] = useState<ManComSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -203,6 +221,7 @@ export default function ManCom() {
               </div>
             </div>
           ))}
+          <FleetCard />
           <div className="card">
             <div className="railh" style={{ marginBottom: 8 }}>Ask AI</div>
             <Link to="/ask" className="btn" style={{ display: 'block', textAlign: 'center', color: 'inherit' }}>
