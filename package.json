@@ -1,0 +1,22 @@
+{
+  "name": "ubi-construction-suite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Construction management suite for Ulticon Builders, Inc. and Omega Asia — everything outside the Acumatica ERP.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build:packages": "npm run build -w @ubi/types -w @ubi/storage",
+    "build:api": "npm run build:packages && npm run build -w @ubi/api",
+    "build:web": "npm run build:packages && npm run build -w @ubi/web",
+    "build": "npm run build:packages && npm run build -w @ubi/api && npm run build -w @ubi/web",
+    "dev:api": "npm run build:packages && npm run start:dev -w @ubi/api",
+    "dev:web": "npm run dev -w @ubi/web",
+    "typecheck": "npm run build:packages && npm run typecheck -w @ubi/api -w @ubi/web"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}

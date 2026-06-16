@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UBI Construction Suite — Functional Diagrams</title>
+<style>
+  :root{
+    --ink:#0f2233;          /* deep blueprint navy */
+    --line:#23476b;         /* schematic line */
+    --paper:#eef2f5;        /* drafting paper */
+    --paper2:#e3e9ee;
+    --box:#ffffff;
+    --accent:#c2410c;       /* surveyor's flag orange */
+    --accent2:#0e7490;      /* teal for data */
+    --pillar:#1d4ed8;       /* foundation blue */
+    --ext:#475569;          /* external grey */
+    --muted:#5b6b7a;
+    --hair:#b9c6d1;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Inter","Segoe UI",system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 22px 80px}
+  header.doc{
+    border:2px solid var(--ink);
+    background:
+      repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(35,71,107,.06) 23px,rgba(35,71,107,.06) 24px),
+      repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(35,71,107,.06) 23px,rgba(35,71,107,.06) 24px),
+      var(--box);
+    padding:26px 28px;
+    position:relative;
+  }
+  header.doc h1{
+    font-size:25px;margin:0 0 4px;letter-spacing:.2px;font-weight:800;
+  }
+  header.doc .sub{font-family:ui-monospace,"SFMono-Regular",Menlo,monospace;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+  header.doc .meta{margin-top:14px;font-size:13px;color:var(--muted);max-width:760px}
+  .stamp{
+    position:absolute;top:18px;right:20px;border:2px solid var(--accent);color:var(--accent);
+    font-family:ui-monospace,monospace;font-size:10px;letter-spacing:1px;padding:6px 9px;
+    transform:rotate(-5deg);text-align:center;line-height:1.3;opacity:.85
+  }
+  h2.section{
+    font-family:ui-monospace,monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;
+    color:var(--line);margin:46px 0 4px;display:flex;align-items:center;gap:12px;
+  }
+  h2.section::before{content:attr(data-n);background:var(--ink);color:#fff;font-size:11px;padding:3px 8px;border-radius:2px}
+  h2.section::after{content:"";flex:1;height:1px;background:var(--hair)}
+  .lead{font-size:14px;color:var(--muted);margin:6px 0 18px;max-width:780px}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:14px 0 8px;font-size:12px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{width:14px;height:14px;border:1.5px solid var(--ink);border-radius:2px;display:inline-block}
+  .sw-dept{background:var(--box)}
+  .sw-pillar{background:#dbe7ff;border-color:var(--pillar)}
+  .sw-ext{background:#e2e8f0;border-color:var(--ext);border-style:dashed}
+  .sw-flag{background:var(--accent);border-color:var(--accent)}
+
+  /* SVG frame */
+  .figure{border:1px solid var(--hair);background:var(--box);border-radius:4px;padding:10px;margin:8px 0 6px;overflow-x:auto}
+  .figure svg{display:block;min-width:680px;width:100%;height:auto}
+  figcaption{font-size:12px;color:var(--muted);font-family:ui-monospace,monospace;letter-spacing:.5px;margin:2px 2px 0}
+
+  /* department cards */
+  .dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:8px}
+  .dept{border:1.5px solid var(--ink);border-radius:5px;background:var(--box);overflow:hidden;display:flex;flex-direction:column}
+  .dept > .name{
+    background:var(--ink);color:#fff;padding:9px 13px;font-weight:700;font-size:14px;
+    display:flex;justify-content:space-between;align-items:center;gap:8px
+  }
+  .dept > .name .tag{font-family:ui-monospace,monospace;font-size:10px;font-weight:500;opacity:.7;letter-spacing:1px}
+  .dept .inside{padding:11px 13px;border-bottom:1px dashed var(--hair)}
+  .dept .inside .h{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:1.3px;color:var(--muted);text-transform:uppercase;margin-bottom:7px}
+  .pills{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{border:1px solid var(--hair);background:var(--paper);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--ink)}
+  .pill.key{border-color:var(--accent);color:var(--accent);background:#fff5f0;font-weight:600}
+  .conns{padding:10px 13px;font-size:12.5px;display:flex;flex-direction:column;gap:6px}
+  .conns .row{display:flex;gap:8px;align-items:flex-start}
+  .conns .dir{font-family:ui-monospace,monospace;font-size:10px;font-weight:700;letter-spacing:.5px;padding:2px 6px;border-radius:3px;white-space:nowrap;margin-top:1px}
+  .in{background:#e6f4f1;color:#0e7490;border:1px solid #b7dcd6}
+  .out{background:#fdece3;color:var(--accent);border:1px solid #f3c9b3}
+  .conns .who{color:var(--muted)}
+  .conns .who b{color:var(--ink);font-weight:600}
+
+  .note{border-left:3px solid var(--accent);background:#fff7f3;padding:10px 14px;margin:16px 0;font-size:13px;color:#7a3414;border-radius:0 4px 4px 0}
+  footer{margin-top:54px;border-top:1px solid var(--hair);padding-top:16px;font-size:12px;color:var(--muted);font-family:ui-monospace,monospace}
+
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    .figure{break-inside:avoid;border-color:#ccc}
+    .dept{break-inside:avoid}
+    h2.section{break-after:avoid}
+    .stamp{opacity:.6}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="stamp">FUNCTIONAL<br>VIEW · NO TECH<br>REV A</div>
+    <div class="sub">Ulticon Builders, Inc. · Omega Asia</div>
+    <h1>Construction Suite — Functional &amp; Data-Flow Diagrams</h1>
+    <div class="meta">A business-level view of every department: what each one contains, how it connects to the others, and how information moves through the suite. Drawn without any technology so it can be read by management, auditors, and department heads alike.</div>
+  </header>
+
+  <div class="legend">
+    <span><i class="swatch sw-dept"></i> Department module</span>
+    <span><i class="swatch sw-pillar"></i> Shared pillar (used by all)</span>
+    <span><i class="swatch sw-ext"></i> External system</span>
+    <span><i class="swatch sw-flag"></i> Key / priority element</span>
+  </div>
+
+  <!-- ============================ SECTION 1: SYSTEM MAP ============================ -->
+  <h2 class="section" data-n="01">System Block Diagram</h2>
+  <p class="lead">The whole suite at a glance. Field and department work flows upward to the CEO’s ManCom view. Three shared pillars sit underneath everything; external systems connect at the sides.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 980 760" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+      <defs>
+        <marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#23476b"/>
+        </marker>
+        <marker id="arrL" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 z" fill="#1d4ed8"/>
+        </marker>
+      </defs>
+
+      <!-- TOP: CEO -->
+      <rect x="320" y="20" width="340" height="58" rx="6" fill="#0f2233"/>
+      <text x="490" y="44" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">CEO / Office of the President</text>
+      <text x="490" y="64" text-anchor="middle" fill="#aebfce" font-size="12">ManCom dashboard · AI insights · trend projection · agentic view</text>
+
+      <!-- Control band -->
+      <text x="40" y="118" font-size="11" fill="#5b6b7a" font-family="ui-monospace,monospace" letter-spacing="1.5">CONTROL</text>
+      <rect x="120" y="100" width="180" height="48" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="210" y="121" text-anchor="middle" font-size="13" font-weight="700">Operations (VPO)</text>
+      <text x="210" y="137" text-anchor="middle" font-size="10.5" fill="#5b6b7a">approvals · subcon · health</text>
+
+      <rect x="680" y="100" width="180" height="48" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="770" y="121" text-anchor="middle" font-size="13" font-weight="700">Audit</text>
+      <text x="770" y="137" text-anchor="middle" font-size="10.5" fill="#5b6b7a">findings · exceptions · oversight</text>
+
+      <!-- FIELD / DELIVERY cluster -->
+      <rect x="60" y="190" width="430" height="220" rx="7" fill="#f4f7f9" stroke="#b9c6d1"/>
+      <text x="75" y="210" font-size="11" fill="#5b6b7a" font-family="ui-monospace,monospace" letter-spacing="1.5">FIELD &amp; DELIVERY</text>
+
+      <rect x="78" y="222" width="190" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="173" y="241" text-anchor="middle" font-size="12.5" font-weight="700">Engineering</text>
+      <text x="173" y="256" text-anchor="middle" font-size="10" fill="#5b6b7a">bid·budget·qty·billing·SWA</text>
+
+      <rect x="282" y="222" width="190" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="377" y="241" text-anchor="middle" font-size="12.5" font-weight="700">Procurement</text>
+      <text x="377" y="256" text-anchor="middle" font-size="10" fill="#5b6b7a">schedule·receiving·suppliers</text>
+
+      <rect x="78" y="276" width="122" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="139" y="295" text-anchor="middle" font-size="12.5" font-weight="700">Survey</text>
+      <text x="139" y="310" text-anchor="middle" font-size="10" fill="#5b6b7a">volumes·stations</text>
+
+      <rect x="212" y="276" width="122" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="273" y="295" text-anchor="middle" font-size="12.5" font-weight="700">MQC</text>
+      <text x="273" y="310" text-anchor="middle" font-size="10" fill="#5b6b7a">tests·certs</text>
+
+      <rect x="346" y="276" width="126" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="409" y="295" text-anchor="middle" font-size="12.5" font-weight="700">Property</text>
+      <text x="409" y="310" text-anchor="middle" font-size="10" fill="#5b6b7a">QR custody</text>
+
+      <rect x="78" y="330" width="394" height="40" rx="5" fill="#fff5f0" stroke="#c2410c" stroke-width="1.3"/>
+      <text x="275" y="349" text-anchor="middle" font-size="11.5" font-weight="700" fill="#c2410c">Field capture · photo + GPS + time → AI encode (off-box)</text>
+      <text x="275" y="363" text-anchor="middle" font-size="9.5" fill="#9a4a23">DR receiving · progress · billing photos</text>
+
+      <!-- SUPPORT cluster -->
+      <rect x="510" y="190" width="410" height="220" rx="7" fill="#f4f7f9" stroke="#b9c6d1"/>
+      <text x="525" y="210" font-size="11" fill="#5b6b7a" font-family="ui-monospace,monospace" letter-spacing="1.5">SUPPORT &amp; SERVICES</text>
+
+      <rect x="528" y="222" width="125" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="590" y="241" text-anchor="middle" font-size="12.5" font-weight="700">IT</text>
+      <text x="590" y="256" text-anchor="middle" font-size="9.5" fill="#5b6b7a">monitor·help·capacity</text>
+
+      <rect x="664" y="222" width="120" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="724" y="241" text-anchor="middle" font-size="12.5" font-weight="700">Records</text>
+      <text x="724" y="256" text-anchor="middle" font-size="9.5" fill="#5b6b7a">registry·expiry</text>
+
+      <rect x="795" y="222" width="110" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="850" y="241" text-anchor="middle" font-size="12.5" font-weight="700">Finance</text>
+      <text x="850" y="256" text-anchor="middle" font-size="9.5" fill="#5b6b7a">doc batches</text>
+
+      <rect x="528" y="276" width="125" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="590" y="295" text-anchor="middle" font-size="12.5" font-weight="700">Admin / OHS</text>
+      <text x="590" y="310" text-anchor="middle" font-size="9.5" fill="#5b6b7a">site gateway·safety</text>
+
+      <rect x="664" y="276" width="120" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="724" y="295" text-anchor="middle" font-size="12.5" font-weight="700">HR</text>
+      <text x="724" y="310" text-anchor="middle" font-size="9.5" fill="#5b6b7a">hours engine</text>
+
+      <rect x="795" y="276" width="110" height="44" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.5"/>
+      <text x="850" y="295" text-anchor="middle" font-size="12.5" font-weight="700">Clinic</text>
+      <text x="850" y="310" text-anchor="middle" font-size="9.5" fill="#5b6b7a">isolated</text>
+
+      <rect x="528" y="330" width="377" height="40" rx="5" fill="#fff" stroke="#0f2233" stroke-width="1.2" stroke-dasharray="0"/>
+      <text x="716" y="354" text-anchor="middle" font-size="11" fill="#5b6b7a">Shared services: approvals · ticketing · expiry reminders · notifications</text>
+
+      <!-- PILLARS foundation -->
+      <rect x="60" y="440" width="860" height="74" rx="7" fill="#eaf0ff" stroke="#1d4ed8" stroke-width="1.5"/>
+      <text x="75" y="461" font-size="11" fill="#1d4ed8" font-family="ui-monospace,monospace" letter-spacing="1.5">FOUNDATION · USED BY EVERY MODULE</text>
+      <rect x="80" y="470" width="260" height="34" rx="5" fill="#dbe7ff" stroke="#1d4ed8"/>
+      <text x="210" y="492" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d3a8a">Identity &amp; Access</text>
+      <rect x="360" y="470" width="260" height="34" rx="5" fill="#dbe7ff" stroke="#1d4ed8"/>
+      <text x="490" y="492" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d3a8a">Document Tracking</text>
+      <rect x="640" y="470" width="260" height="34" rx="5" fill="#dbe7ff" stroke="#1d4ed8"/>
+      <text x="770" y="492" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1d3a8a">AI-Queryable Data Layer</text>
+
+      <!-- EXTERNAL -->
+      <text x="40" y="556" font-size="11" fill="#5b6b7a" font-family="ui-monospace,monospace" letter-spacing="1.5">EXTERNAL SYSTEMS (systems of record)</text>
+      <rect x="80" y="568" width="180" height="46" rx="5" fill="#e2e8f0" stroke="#475569" stroke-width="1.4" stroke-dasharray="5 3"/>
+      <text x="170" y="589" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Acumatica</text>
+      <text x="170" y="604" text-anchor="middle" font-size="10" fill="#5b6b7a">ERP · finance truth</text>
+
+      <rect x="280" y="568" width="170" height="46" rx="5" fill="#e2e8f0" stroke="#475569" stroke-width="1.4" stroke-dasharray="5 3"/>
+      <text x="365" y="589" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">Ezacctg</text>
+      <text x="365" y="604" text-anchor="middle" font-size="10" fill="#5b6b7a">payroll · 201 · statutory</text>
+
+      <rect x="470" y="568" width="170" height="46" rx="5" fill="#e2e8f0" stroke="#475569" stroke-width="1.4" stroke-dasharray="5 3"/>
+      <text x="555" y="589" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">OAEC (Omega)</text>
+      <text x="555" y="604" text-anchor="middle" font-size="10" fill="#5b6b7a">fleet · equipment</text>
+
+      <rect x="660" y="568" width="160" height="46" rx="5" fill="#e2e8f0" stroke="#475569" stroke-width="1.4" stroke-dasharray="5 3"/>
+      <text x="740" y="589" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">BSmart</text>
+      <text x="740" y="604" text-anchor="middle" font-size="10" fill="#5b6b7a">fuel dispensers</text>
+
+      <!-- connector lines -->
+      <!-- clusters & control -> CEO -->
+      <line x1="210" y1="100" x2="380" y2="78" stroke="#23476b" marker-end="url(#arr)"/>
+      <line x1="770" y1="100" x2="600" y2="78" stroke="#23476b" marker-end="url(#arr)"/>
+      <line x1="275" y1="190" x2="430" y2="100" stroke="#23476b" marker-end="url(#arr)"/>
+      <line x1="716" y1="190" x2="560" y2="100" stroke="#23476b" marker-end="url(#arr)"/>
+      <!-- AI layer -> CEO (long) -->
+      <line x1="490" y1="470" x2="490" y2="78" stroke="#1d4ed8" stroke-dasharray="3 3" marker-end="url(#arrL)" opacity=".55"/>
+      <!-- engineering <-> procurement -->
+      <line x1="268" y1="244" x2="282" y2="244" stroke="#23476b" marker-end="url(#arr)"/>
+      <!-- external links -->
+      <line x1="377" y1="266" x2="200" y2="568" stroke="#475569" stroke-dasharray="4 3" marker-end="url(#arr)" opacity=".6"/>
+      <line x1="724" y1="320" x2="380" y2="568" stroke="#475569" stroke-dasharray="4 3" marker-end="url(#arr)" opacity=".6"/>
+      <line x1="173" y1="266" x2="540" y2="568" stroke="#475569" stroke-dasharray="4 3" marker-end="url(#arr)" opacity=".5"/>
+    </svg>
+    <figcaption>FIG 01 · Suite block diagram — flow rises from field/support work, through control (VPO/Audit), to the CEO. Pillars underpin all; external systems hold the record.</figcaption>
+  </figure>
+
+  <!-- ============================ SECTION 2: PER-DEPARTMENT ============================ -->
+  <h2 class="section" data-n="02">Block Diagram per Department</h2>
+  <p class="lead">Each department as a block: its name, what sits inside it, and the modules it connects to. <b style="color:#0e7490">IN</b> = receives from · <b style="color:#c2410c">OUT</b> = sends to.</p>
+
+  <div class="dept-grid">
+
+    <!-- ENGINEERING -->
+    <div class="dept">
+      <div class="name">Engineering <span class="tag">CORE</span></div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Bidding</span>
+          <span class="pill">Financial Planning · office &amp; field budget</span>
+          <span class="pill">Quantity takeoff</span>
+          <span class="pill key">Weekly Materials Schedule (AI-aided)</span>
+          <span class="pill">Weekly SWA</span>
+          <span class="pill key">Progress photos</span>
+          <span class="pill">Billing (monthly, DPWH)</span>
+          <span class="pill">Contracts</span>
+          <span class="pill">Archiving</span>
+          <span class="pill">Pay-item library</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who"><b>Survey</b> volumes/cross-sections · <b>MQC</b> material certs · <b>Operations</b> approvals</span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">materials schedule → <b>Procurement</b> · equipment schedule → <b>OAEC</b> · SWA/billing → <b>CEO/ManCom</b> · transmittals → <b>Doc Tracking</b></span></div>
+      </div>
+    </div>
+
+    <!-- PROCUREMENT -->
+    <div class="dept">
+      <div class="name">Procurement</div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Materials schedule intake</span>
+          <span class="pill key">Delivery receiving · DR photo + AI encode</span>
+          <span class="pill">Supplier performance</span>
+          <span class="pill">Cement delivery monitoring</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">approved schedule from <b>Engineering</b> (via <b>Operations</b>)</span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">PO/expenses + encoded DR → <b>Acumatica</b> · follow-ups CC → <b>Operations</b> · performance → <b>CEO</b></span></div>
+      </div>
+    </div>
+
+    <!-- OPERATIONS -->
+    <div class="dept">
+      <div class="name">Operations · VPO <span class="tag">CONTROL</span></div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill key">Approvals inbox</span>
+          <span class="pill">Subcontract registry</span>
+          <span class="pill">Project health dashboard</span>
+          <span class="pill">Standards</span>
+          <span class="pill">Issue rectification (first stop)</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">requests &amp; status from <b>all field modules</b> · procurement follow-ups</span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">approvals back to source · vetted reports → <b>CEO</b> (most pass here first)</span></div>
+      </div>
+    </div>
+
+    <!-- SURVEY -->
+    <div class="dept">
+      <div class="name">Survey</div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Original ground</span>
+          <span class="pill">Stakeout</span>
+          <span class="pill">Cross-sections</span>
+          <span class="pill">As-built</span>
+          <span class="pill">Station / chainage index</span>
+          <span class="pill key">Monthly volume</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir out">OUT</span><span class="who">quantities/cross-sections → <b>Engineering</b> · monthly volume → <b>CEO/ManCom</b></span></div>
+      </div>
+    </div>
+
+    <!-- MQC -->
+    <div class="dept">
+      <div class="name">MQC</div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">DPWH minimum testing per pay item</span>
+          <span class="pill">Lab results</span>
+          <span class="pill">Pour logs</span>
+          <span class="pill key">Material certificates</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir out">OUT</span><span class="who">certs → <b>Engineering Billing</b> · quality status → <b>CEO/ManCom</b></span></div>
+      </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="dept">
+      <div class="name">Audit <span class="tag">OVERSIGHT</span></div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Findings / observations register</span>
+          <span class="pill">Follow-up tracking</span>
+          <span class="pill">Compliance checklists</span>
+          <span class="pill key">Exception / investigation tracker</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">read-access across <b>all modules</b></span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">exceptions &amp; findings → <b>CEO</b></span></div>
+      </div>
+    </div>
+
+    <!-- IT -->
+    <div class="dept">
+      <div class="name">IT <span class="tag">EXPANDING</span></div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Device monitoring + map</span>
+          <span class="pill">Firewall / endpoint status</span>
+          <span class="pill">DeskGuard v2 · activity &amp; productivity</span>
+          <span class="pill">AI helpdesk · Kanban, auto-assign</span>
+          <span class="pill">Maintenance (PMS) scheduler</span>
+          <span class="pill">Environmental monitoring</span>
+          <span class="pill key">Capacity planning &amp; controls</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">active assets from <b>Property</b> (for PMS)</span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">device/capacity status → <b>CEO</b> · shares ticketing with <b>Admin</b></span></div>
+      </div>
+    </div>
+
+    <!-- RECORDS -->
+    <div class="dept">
+      <div class="name">Records</div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill key">Document registry (Doc-Tracking home)</span>
+          <span class="pill">Vehicle reg / insurance / stamps + expiry</span>
+          <span class="pill">Physical location index (access-gated)</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">incoming docs from <b>all departments</b></span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">outgoing docs · expiry alerts → <b>Notifications</b> · docs → <b>Finance</b></span></div>
+      </div>
+    </div>
+
+    <!-- CLINIC -->
+    <div class="dept">
+      <div class="name">Clinic <span class="tag">ISOLATED</span></div>
+      <div class="inside">
+        <div class="h">Inside · encrypted, role-isolated</div>
+        <div class="pills">
+          <span class="pill">Pre-employment / annual medicals</span>
+          <span class="pill">Site clinic visits</span>
+          <span class="pill">Medicine issuance</span>
+          <span class="pill">Injury / incident reports</span>
+          <span class="pill">DOLE compliance</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir out">OUT</span><span class="who"><b>aggregate only</b> → <b>CEO</b> (no individual records) · sits under <b>Admin</b> org-wise</span></div>
+      </div>
+    </div>
+
+    <!-- ADMIN -->
+    <div class="dept">
+      <div class="name">Admin / OHS <span class="tag">GATEWAY</span></div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Safety trainings &amp; seminars</span>
+          <span class="pill">Toolbox meeting logs</span>
+          <span class="pill">PPE / medicine dispensing</span>
+          <span class="pill key">Admin officers portal + timekeepers</span>
+          <span class="pill">Conference booking</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">site inquiries/requests · houses <b>Clinic</b></span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">bridges <b>HR</b> ↔ site · shares ticketing with <b>IT</b> · dispensing ↔ <b>Property</b></span></div>
+      </div>
+    </div>
+
+    <!-- HR -->
+    <div class="dept">
+      <div class="name">HR <span class="tag">THIN</span></div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Attendance · tablet photo + PIN</span>
+          <span class="pill key">Hours-computation engine</span>
+          <span class="pill">DTR</span>
+          <span class="pill">Face ID (phase 2)</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir out">OUT</span><span class="who">clean hours/totals → <b>Ezacctg</b> (201/payroll/statutory live there)</span></div>
+      </div>
+    </div>
+
+    <!-- PROPERTY -->
+    <div class="dept">
+      <div class="name">Property</div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill">Asset custody · PAR / MR</span>
+          <span class="pill key">QR scan · location · status · custodian</span>
+          <span class="pill">Tool issuance / return</span>
+          <span class="pill">Warehouse custody</span>
+          <span class="pill">Monthly custodian attestation</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir out">OUT</span><span class="who">active assets → <b>IT</b> PMS · PPE overlap ↔ <b>Admin</b></span></div>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="dept">
+      <div class="name">Finance</div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill key">Document batching / boxing → cashier</span>
+          <span class="pill">Incoming docs intake</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">docs from <b>Records</b> &amp; other departments</span></div>
+        <div class="row"><span class="dir out">OUT</span><span class="who">finance truth (PO/payments) lives in <b>Acumatica</b></span></div>
+      </div>
+    </div>
+
+    <!-- CEO -->
+    <div class="dept">
+      <div class="name">CEO / Office of the President <span class="tag">ENDPOINT</span></div>
+      <div class="inside">
+        <div class="h">Inside</div>
+        <div class="pills">
+          <span class="pill key">ManCom live dashboard</span>
+          <span class="pill">Trend projection toggle</span>
+          <span class="pill">AI insights · delays, performance</span>
+          <span class="pill">Conversational AI</span>
+          <span class="pill">Agentic iframe view</span>
+        </div>
+      </div>
+      <div class="conns">
+        <div class="row"><span class="dir in">IN</span><span class="who">consolidated from <b>all departments</b> (via <b>Operations</b> + <b>AI Data Layer</b>)</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note"><b>Pillars are not shown as cards</b> because they belong to no single department — Identity &amp; Access, Document Tracking, and the AI-Queryable Data Layer are used by every block above.</div>
+
+  <!-- ============================ SECTION 3: DFD L0 ============================ -->
+  <h2 class="section" data-n="03">Data-Flow Diagram — Level 0 (Context)</h2>
+  <p class="lead">The suite as a single process, with the people and outside systems it exchanges information with.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 940 520" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+      <defs>
+        <marker id="a0" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#0e7490"/></marker>
+      </defs>
+      <!-- central process -->
+      <circle cx="470" cy="260" r="98" fill="#0f2233"/>
+      <text x="470" y="252" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">UBI Construction</text>
+      <text x="470" y="272" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">Suite</text>
+      <text x="470" y="292" text-anchor="middle" fill="#aebfce" font-size="11">process 0</text>
+
+      <!-- entities -->
+      <g font-size="12" font-weight="700">
+        <rect x="40" y="60" width="170" height="56" rx="4" fill="#fff" stroke="#0e7490" stroke-width="1.5"/>
+        <text x="125" y="84" text-anchor="middle">Field staff</text>
+        <text x="125" y="101" text-anchor="middle" font-size="10" font-weight="400" fill="#5b6b7a">PE · QE · inspectors</text>
+
+        <rect x="40" y="232" width="170" height="56" rx="4" fill="#fff" stroke="#0e7490" stroke-width="1.5"/>
+        <text x="125" y="256" text-anchor="middle">Office staff</text>
+        <text x="125" y="273" text-anchor="middle" font-size="10" font-weight="400" fill="#5b6b7a">depts · clerks</text>
+
+        <rect x="40" y="404" width="170" height="56" rx="4" fill="#fff" stroke="#0e7490" stroke-width="1.5"/>
+        <text x="125" y="428" text-anchor="middle">CEO / VPO</text>
+        <text x="125" y="445" text-anchor="middle" font-size="10" font-weight="400" fill="#5b6b7a">management</text>
+
+        <rect x="730" y="60" width="170" height="56" rx="4" fill="#eef2f5" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="815" y="84" text-anchor="middle">Acumatica</text>
+        <text x="815" y="101" text-anchor="middle" font-size="10" font-weight="400" fill="#5b6b7a">ERP</text>
+
+        <rect x="730" y="146" width="170" height="56" rx="4" fill="#eef2f5" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="815" y="170" text-anchor="middle">Ezacctg</text>
+        <text x="815" y="187" text-anchor="middle" font-size="10" font-weight="400" fill="#5b6b7a">payroll</text>
+
+        <rect x="730" y="318" width="170" height="56" rx="4" fill="#eef2f5" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="815" y="342" text-anchor="middle">OAEC</text>
+        <text x="815" y="359" text-anchor="middle" font-size="10" font-weight="400" fill="#5b6b7a">Omega fleet</text>
+
+        <rect x="730" y="404" width="170" height="56" rx="4" fill="#eef2f5" stroke="#475569" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="815" y="428" text-anchor="middle">DPWH</text>
+        <text x="815" y="445" text-anchor="middle" font-size="10" font-weight="400" fill="#5b6b7a">billing recipient</text>
+      </g>
+
+      <!-- flows -->
+      <g stroke="#0e7490" font-size="10.5" fill="#0e7490">
+        <line x1="210" y1="88" x2="392" y2="210" marker-end="url(#a0)"/>
+        <text x="270" y="135" transform="rotate(30 270 135)">captures · photos</text>
+
+        <line x1="210" y1="260" x2="372" y2="260" marker-end="url(#a0)"/>
+        <text x="240" y="252">forms · docs</text>
+
+        <line x1="392" y1="312" x2="210" y2="430" marker-end="url(#a0)"/>
+        <text x="232" y="372" transform="rotate(-30 232 372)">ManCom · insights</text>
+
+        <line x1="568" y1="210" x2="730" y2="100" marker-end="url(#a0)"/>
+        <text x="612" y="150" transform="rotate(-33 612 150)">encoded DR</text>
+
+        <line x1="568" y1="240" x2="730" y2="176" marker-end="url(#a0)"/>
+        <text x="616" y="214">hours</text>
+
+        <line x1="568" y1="290" x2="730" y2="344" marker-end="url(#a0)"/>
+        <text x="610" y="324" transform="rotate(28 610 324)">equipment sched.</text>
+
+        <line x1="560" y1="320" x2="730" y2="430" marker-end="url(#a0)"/>
+        <text x="600" y="392" transform="rotate(33 600 392)">monthly billing</text>
+      </g>
+    </svg>
+    <figcaption>FIG 03 · Context diagram — who feeds the suite and what it returns. Arrows are information, not paper.</figcaption>
+  </figure>
+
+  <!-- ============================ SECTION 4: DFD L1 ============================ -->
+  <h2 class="section" data-n="04">Data-Flow Diagram — Level 1</h2>
+  <p class="lead">Inside the suite: the major processes, the stores that hold information, and how a capture becomes a delivery record, an accomplishment, a billing, and finally a ManCom figure.</p>
+
+  <figure class="figure">
+    <svg viewBox="0 0 960 600" xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif">
+      <defs>
+        <marker id="a1" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#23476b"/></marker>
+      </defs>
+      <style>
+        .proc{fill:#0f2233}
+        .ptext{fill:#fff;font-weight:700;font-size:12.5px}
+        .psub{fill:#aebfce;font-size:9.5px}
+        .store{fill:#fff;stroke:#1d4ed8;stroke-width:1.4}
+        .stext{fill:#1d3a8a;font-weight:700;font-size:11px}
+        .ent{fill:#eef2f5;stroke:#475569;stroke-width:1.3;stroke-dasharray:5 3}
+        .flow{stroke:#23476b;fill:none}
+        .ftext{fill:#5b6b7a;font-size:9.5px}
+      </style>
+
+      <!-- entities left -->
+      <rect class="ent" x="20" y="40" width="120" height="44" rx="4"/>
+      <text x="80" y="67" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">Field staff</text>
+      <rect class="ent" x="20" y="470" width="120" height="44" rx="4"/>
+      <text x="80" y="497" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">CEO / VPO</text>
+
+      <!-- P1 capture -->
+      <rect class="proc" x="190" y="34" width="150" height="58" rx="8"/>
+      <text class="ptext" x="265" y="58" text-anchor="middle">1 · Field capture</text>
+      <text class="psub" x="265" y="74" text-anchor="middle">photo·GPS·time·encode</text>
+
+      <!-- P2 quantities/SWA -->
+      <rect class="proc" x="190" y="170" width="150" height="58" rx="8"/>
+      <text class="ptext" x="265" y="194" text-anchor="middle">2 · Quantity &amp; SWA</text>
+      <text class="psub" x="265" y="210" text-anchor="middle">measure·accomplish</text>
+
+      <!-- P3 procurement -->
+      <rect class="proc" x="410" y="34" width="150" height="58" rx="8"/>
+      <text class="ptext" x="485" y="58" text-anchor="middle">3 · Procurement</text>
+      <text class="psub" x="485" y="74" text-anchor="middle">schedule·receive</text>
+
+      <!-- P4 billing -->
+      <rect class="proc" x="410" y="170" width="150" height="58" rx="8"/>
+      <text class="ptext" x="485" y="194" text-anchor="middle">4 · Billing</text>
+      <text class="psub" x="485" y="210" text-anchor="middle">monthly·to DPWH</text>
+
+      <!-- P5 doc routing -->
+      <rect class="proc" x="410" y="320" width="150" height="58" rx="8"/>
+      <text class="ptext" x="485" y="344" text-anchor="middle">5 · Document routing</text>
+      <text class="psub" x="485" y="360" text-anchor="middle">transmittal·track</text>
+
+      <!-- P6 consolidation -->
+      <rect class="proc" x="190" y="430" width="150" height="58" rx="8"/>
+      <text class="ptext" x="265" y="454" text-anchor="middle">6 · Consolidation</text>
+      <text class="psub" x="265" y="470" text-anchor="middle">ManCom·AI insights</text>
+
+      <!-- data stores (right) -->
+      <g>
+        <rect class="store" x="650" y="40" width="200" height="34" rx="3"/>
+        <text class="stext" x="660" y="62">D1 · Deliveries / DR</text>
+        <rect class="store" x="650" y="92" width="200" height="34" rx="3"/>
+        <text class="stext" x="660" y="114">D2 · Pay items &amp; budgets</text>
+        <rect class="store" x="650" y="144" width="200" height="34" rx="3"/>
+        <text class="stext" x="660" y="166">D3 · SWA / accomplishment</text>
+        <rect class="store" x="650" y="196" width="200" height="34" rx="3"/>
+        <text class="stext" x="660" y="218">D4 · Quality &amp; survey</text>
+        <rect class="store" x="650" y="248" width="200" height="34" rx="3"/>
+        <text class="stext" x="660" y="270">D5 · Billings</text>
+        <rect class="store" x="650" y="300" width="200" height="34" rx="3"/>
+        <text class="stext" x="660" y="322">D6 · Document register</text>
+        <rect class="store" x="650" y="352" width="200" height="34" rx="3"/>
+        <text class="stext" x="660" y="374">D7 · Assets &amp; custody</text>
+      </g>
+
+      <!-- entity dashed externals bottom right -->
+      <rect class="ent" x="650" y="430" width="95" height="40" rx="4"/>
+      <text x="697" y="455" text-anchor="middle" font-size="10.5" font-weight="700" fill="#334155">Acumatica</text>
+      <rect class="ent" x="755" y="430" width="95" height="40" rx="4"/>
+      <text x="802" y="455" text-anchor="middle" font-size="10.5" font-weight="700" fill="#334155">DPWH</text>
+
+      <!-- flows -->
+      <path class="flow" d="M140,62 H190" marker-end="url(#a1)"/>
+      <text class="ftext" x="148" y="55">capture</text>
+
+      <path class="flow" d="M340,63 H410" marker-end="url(#a1)"/>
+      <text class="ftext" x="350" y="56">DR detail</text>
+
+      <path class="flow" d="M560,63 H650" marker-end="url(#a1)"/>
+      <text class="ftext" x="575" y="56">store D1</text>
+
+      <path class="flow" d="M485,92 V40 H650" marker-end="url(#a1)" opacity="0"/>
+      <path class="flow" d="M560,58 C610,58 610,57 650,57" marker-end="url(#a1)"/>
+
+      <path class="flow" d="M265,92 V170" marker-end="url(#a1)"/>
+      <text class="ftext" x="270" y="135">photos</text>
+
+      <path class="flow" d="M340,199 H410" marker-end="url(#a1)"/>
+      <text class="ftext" x="350" y="192">SWA ref</text>
+
+      <path class="flow" d="M340,185 C500,150 560,140 650,116" marker-end="url(#a1)"/>
+      <text class="ftext" x="430" y="150">read D2</text>
+
+      <path class="flow" d="M340,210 C480,235 560,235 650,161" marker-end="url(#a1)"/>
+      <text class="ftext" x="430" y="240">store D3</text>
+
+      <path class="flow" d="M560,205 C600,212 610,213 650,213" marker-end="url(#a1)"/>
+      <text class="ftext" x="572" y="200">read D4</text>
+
+      <path class="flow" d="M560,200 C610,250 620,255 650,262" marker-end="url(#a1)"/>
+      <text class="ftext" x="585" y="248">store D5</text>
+
+      <path class="flow" d="M485,228 V320" marker-end="url(#a1)"/>
+      <text class="ftext" x="490" y="280">attach</text>
+
+      <path class="flow" d="M560,349 H650" marker-end="url(#a1)"/>
+      <text class="ftext" x="575" y="342">store D6</text>
+
+      <path class="flow" d="M485,378 C485,410 730,410 720,430" marker-end="url(#a1)"/>
+      <text class="ftext" x="560" y="404">route to cashier</text>
+
+      <path class="flow" d="M485,228 C600,290 730,360 760,430" marker-end="url(#a1)"/>
+      <text class="ftext" x="640" y="350">billing → DPWH</text>
+
+      <path class="flow" d="M485,92 C560,120 720,180 770,430" marker-end="url(#a1)" opacity=".5"/>
+
+      <!-- consolidation reads stores -->
+      <path class="flow" d="M650,57 C420,120 340,300 340,452" marker-end="url(#a1)" opacity=".45"/>
+      <path class="flow" d="M650,265 C430,300 340,380 340,460" marker-end="url(#a1)" opacity=".45"/>
+      <text class="ftext" x="360" y="410">read D1–D7</text>
+
+      <path class="flow" d="M190,459 H140" marker-end="url(#a1)"/>
+      <text class="ftext" x="146" y="452">dashboard</text>
+    </svg>
+    <figcaption>FIG 04 · Level-1 DFD — circles are processes, blue boxes are stores (D1–D7), dashed boxes are external. A capture (P1) becomes a delivery (D1), feeds quantities/SWA (P2→D3), drives billing (P4→D5), routes as documents (P5→D6), and rolls up to ManCom (P6).</figcaption>
+  </figure>
+
+  <footer>
+    Ulticon Builders, Inc. — Construction Suite · Functional &amp; DFD set · Rev A<br>
+    Companion to the Claude Code context pack (CLAUDE.md + per-module files). Open in any browser; use Print → Save as PDF for a PDF copy.
+  </footer>
+
+</div>
+</body>
+</html>

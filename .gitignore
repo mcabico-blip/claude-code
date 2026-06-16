@@ -1,0 +1,20 @@
+# deps & build
+node_modules/
+dist/
+build/
+.vite/
+.turbo/
+coverage/
+
+# env & secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# local file storage — binaries go through StorageProvider, never git
+uploads/
+
+# misc
+*.log
+.DS_Store
+*.local

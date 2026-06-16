@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UBI Construction Suite — CEO Module UI Mockups</title>
+<style>
+  /* ============ document frame (matches diagrams.html family) ============ */
+  :root{
+    --ink:#0f2233;          /* deep blueprint navy */
+    --line:#23476b;         /* schematic line */
+    --paper:#eef2f5;        /* drafting paper */
+    --box:#ffffff;
+    --accent:#c2410c;       /* surveyor's flag orange — primary action */
+    --accent2:#0e7490;      /* teal — data */
+    --pillar:#1d4ed8;       /* foundation blue — AI */
+    --ok:#15803d;
+    --warn:#b45309;
+    --bad:#b91c1c;
+    --muted:#5b6b7a;
+    --hair:#b9c6d1;
+    --uibg:#f3f5f7;         /* app background */
+    --uiline:#e3e8ee;       /* app hairline */
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:"Inter","Segoe UI",system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:40px 22px 80px}
+  header.doc{
+    border:2px solid var(--ink);
+    background:
+      repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(35,71,107,.06) 23px,rgba(35,71,107,.06) 24px),
+      repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(35,71,107,.06) 23px,rgba(35,71,107,.06) 24px),
+      var(--box);
+    padding:26px 28px;position:relative;
+  }
+  header.doc h1{font-size:25px;margin:0 0 4px;letter-spacing:.2px;font-weight:800}
+  header.doc .sub{font-family:ui-monospace,"SFMono-Regular",Menlo,monospace;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+  header.doc .meta{margin-top:14px;font-size:13px;color:var(--muted);max-width:820px}
+  .stamp{position:absolute;top:18px;right:20px;border:2px solid var(--accent);color:var(--accent);font-family:ui-monospace,monospace;font-size:10px;letter-spacing:1px;padding:6px 9px;transform:rotate(-5deg);text-align:center;line-height:1.3;opacity:.85}
+  h2.section{font-family:ui-monospace,monospace;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--line);margin:48px 0 4px;display:flex;align-items:center;gap:12px}
+  h2.section::before{content:attr(data-n);background:var(--ink);color:#fff;font-size:11px;padding:3px 8px;border-radius:2px}
+  h2.section::after{content:"";flex:1;height:1px;background:var(--hair)}
+  .lead{font-size:14px;color:var(--muted);margin:6px 0 18px;max-width:840px}
+  figcaption{font-size:12px;color:var(--muted);font-family:ui-monospace,monospace;letter-spacing:.5px;margin:6px 2px 0}
+  .note{border-left:3px solid var(--accent);background:#fff7f3;padding:10px 14px;margin:16px 0;font-size:13px;color:#7a3414;border-radius:0 4px 4px 0}
+  footer{margin-top:54px;border-top:1px solid var(--hair);padding-top:16px;font-size:12px;color:var(--muted);font-family:ui-monospace,monospace}
+
+  /* ============ mock layout: frame + notes ============ */
+  .shot{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap;margin:10px 0 8px}
+  .shot .art{flex:1 1 680px;min-width:0}
+  .notes{flex:0 0 250px;border:1px solid var(--hair);background:var(--box);border-radius:5px;padding:13px 15px}
+  .notes h4{margin:0 0 8px;font-family:ui-monospace,monospace;font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+  .notes ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:9px}
+  .notes li{font-size:12.2px;color:var(--ink);display:flex;gap:8px;line-height:1.45}
+  .notes li b{font-weight:600}
+  .n{flex:none;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:9.5px;font-weight:700;font-family:ui-monospace,monospace;vertical-align:middle;line-height:1;margin-top:1px}
+  .shot.stack{flex-direction:column}
+  .shot.stack .art{flex:1 1 100%;width:100%}
+  .shot.stack .notes{flex:1 1 100%;width:100%}
+  .shot.stack .notes ol{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 20px}
+  .ui .n{position:relative;z-index:5;box-shadow:0 0 0 2px #fff}
+
+  /* ============ browser frame ============ */
+  .browser{border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;background:#fff;box-shadow:0 14px 34px rgba(15,34,51,.14)}
+  .bbar{display:flex;align-items:center;gap:10px;background:var(--ink);padding:8px 12px}
+  .bdots{display:flex;gap:5px}
+  .bdots i{width:9px;height:9px;border-radius:50%;background:#37536f;display:block}
+  .burl{flex:1;background:#1c3954;color:#9fb4c7;font-family:ui-monospace,monospace;font-size:10.5px;border-radius:4px;padding:4px 10px;letter-spacing:.4px}
+
+  /* ============ app shell ============ */
+  .ui{font-size:11.5px;color:var(--ink)}
+  .shell{display:flex;min-height:600px;background:var(--uibg)}
+  .side{flex:0 0 182px;background:var(--ink);color:#cfdae4;display:flex;flex-direction:column;padding:12px 0 10px}
+  .sbrand{display:flex;align-items:center;gap:8px;padding:2px 14px 12px;border-bottom:1px solid #1d3a54}
+  .slogo{width:26px;height:26px;border-radius:6px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+  .sbrand .t{line-height:1.15}
+  .sbrand .t b{display:block;color:#fff;font-size:12.5px}
+  .sbrand .t span{font-size:9px;color:#8fa6b8;letter-spacing:.8px;text-transform:uppercase}
+  .sentity{margin:10px 12px 4px;background:#1c3954;border:1px solid #2c4d6c;border-radius:5px;padding:6px 9px;font-size:10.5px;color:#dbe7f1;display:flex;justify-content:space-between;align-items:center}
+  .sentity b{color:#fff}
+  .sgrp{padding:11px 14px 4px;font-family:ui-monospace,monospace;font-size:8.5px;letter-spacing:1.6px;color:#7e96aa;text-transform:uppercase}
+  .sitem{display:flex;align-items:center;gap:8px;padding:6px 14px;font-size:11.5px;color:#cfdae4;border-left:3px solid transparent}
+  .sitem.on{background:#1c3954;color:#fff;border-left-color:var(--accent);font-weight:600}
+  .sitem .ico{width:13px;height:13px;border:1.4px solid currentColor;border-radius:3px;opacity:.75;flex:none}
+  .sitem .bdg{margin-left:auto;background:var(--accent);color:#fff;font-size:8.5px;font-weight:700;border-radius:8px;padding:1px 6px}
+  .sitem.dim{color:#8fa6b8;font-size:11px;padding:4.5px 14px}
+  .smore{padding:3px 14px;font-size:10px;color:#6f8aa0}
+  .suser{margin-top:auto;border-top:1px solid #1d3a54;padding:10px 14px;display:flex;gap:8px;align-items:center}
+  .suser .av{width:24px;height:24px;border-radius:50%;background:#2c4d6c;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .suser .who{line-height:1.2}
+  .suser .who b{display:block;color:#fff;font-size:10.5px}
+  .suser .who span{font-size:8.5px;color:#8fa6b8}
+
+  .main{flex:1;min-width:0;padding:14px 16px 18px;display:flex;flex-direction:column;gap:12px}
+  .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .top h3{margin:0;font-size:16px;font-weight:800}
+  .top .per{display:flex;gap:5px}
+  .pchip{border:1px solid var(--uiline);background:#fff;border-radius:14px;padding:3px 11px;font-size:10.5px;color:var(--muted)}
+  .pchip.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+  .top .right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .asof{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px}
+  .asof i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block}
+  .toggle{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--uiline);border-radius:16px;padding:4px 10px 4px 5px}
+  .tg{width:26px;height:15px;border-radius:9px;background:var(--accent);position:relative;flex:none}
+  .tg::after{content:"";position:absolute;top:2px;right:2px;width:11px;height:11px;border-radius:50%;background:#fff}
+  .tg.off{background:#c8d2da}
+  .tg.off::after{right:auto;left:2px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .kpi{background:#fff;border:1px solid var(--uiline);border-radius:7px;padding:10px 12px}
+  .kpi .lab{font-family:ui-monospace,monospace;font-size:8.5px;letter-spacing:1.3px;color:var(--muted);text-transform:uppercase}
+  .kpi .val{font-size:21px;font-weight:800;margin:3px 0 1px;display:flex;align-items:baseline;gap:7px}
+  .kpi .sub{font-size:9.5px;color:var(--muted)}
+  .d-up{font-size:10px;font-weight:700;color:var(--ok)}
+  .d-amb{font-size:10px;font-weight:700;color:var(--warn)}
+  .mchip{font-size:8.5px;font-weight:700;border-radius:9px;padding:1px 7px}
+  .mc-bad{background:#fdecec;color:var(--bad);border:1px solid #f3c2c2}
+  .mc-proj{background:#fff5f0;color:var(--accent);border:1px dashed #e8a886}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .panel{background:#fff;border:1px solid var(--uiline);border-radius:7px;padding:10px 12px;min-width:0}
+  .ph{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .ph b{font-size:11.5px;font-weight:700}
+  .src{margin-left:auto;font-family:ui-monospace,monospace;font-size:8px;letter-spacing:.6px;color:var(--pillar);background:#eef3ff;border:1px solid #ccdaf8;border-radius:3px;padding:1px 6px;white-space:nowrap}
+  .lgnd{display:flex;gap:12px;font-size:9px;color:var(--muted);margin-top:4px;flex-wrap:wrap}
+  .lgnd span{display:inline-flex;align-items:center;gap:5px}
+  .lk{width:14px;height:0;border-top:2.4px solid;display:inline-block}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:10.5px}
+  .tbl th{font-family:ui-monospace,monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);text-align:left;padding:3px 6px;border-bottom:1px solid var(--uiline)}
+  .tbl td{padding:5px 6px;border-bottom:1px solid #eef2f5;vertical-align:middle}
+  .tbl tr:last-child td{border-bottom:0}
+  .st{font-size:8.5px;font-weight:700;border-radius:9px;padding:1.5px 7px;white-space:nowrap}
+  .st-ok{background:#e9f6ee;color:var(--ok);border:1px solid #c4e5d1}
+  .st-warn{background:#fdf3e7;color:var(--warn);border:1px solid #f0d7b5}
+  .st-bad{background:#fdecec;color:var(--bad);border:1px solid #f3c2c2}
+  .st-info{background:#eef3ff;color:var(--pillar);border:1px solid #ccdaf8}
+  .neg{color:var(--bad);font-weight:700}
+  .pos{color:var(--ok);font-weight:700}
+
+  .rail{flex:0 0 248px;display:flex;flex-direction:column;gap:10px;padding:14px 14px 18px 0}
+  .ins{background:#fff;border:1px solid var(--uiline);border-radius:7px;padding:9px 11px;border-left-width:3px}
+  .ins.crit{border-left-color:var(--bad)}
+  .ins.wrn{border-left-color:var(--warn)}
+  .ins.pos{border-left-color:var(--ok)}
+  .ins .sev{font-family:ui-monospace,monospace;font-size:7.5px;letter-spacing:1.2px;font-weight:700}
+  .ins.crit .sev{color:var(--bad)} .ins.wrn .sev{color:var(--warn)} .ins.pos .sev{color:var(--ok)}
+  .ins p{margin:3px 0 6px;font-size:10.5px;line-height:1.45}
+  .evi{display:flex;flex-wrap:wrap;gap:4px}
+  .evi i{font-style:normal;font-family:ui-monospace,monospace;font-size:7.5px;color:var(--accent2);background:#e9f5f6;border:1px solid #c4e2e6;border-radius:3px;padding:1px 5px}
+  .railh{font-family:ui-monospace,monospace;font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .railh a{margin-left:auto;color:var(--pillar);font-size:9px;text-decoration:none;letter-spacing:.3px}
+  .askdock{background:#fff;border:1px solid var(--uiline);border-radius:7px;padding:9px 11px}
+  .askdock .q{font-size:10px;color:var(--muted);font-style:italic;margin:0 0 5px}
+  .askin{display:flex;align-items:center;gap:7px;border:1.3px solid var(--ink);border-radius:18px;padding:5px 11px;font-size:10.5px;color:var(--muted);background:#fff}
+  .askin b{margin-left:auto;color:var(--accent);font-size:12px}
+
+  /* charts */
+  .chart svg{display:block;width:100%;height:auto}
+
+  /* insight page cards (full width) */
+  .insL{background:#fff;border:1px solid var(--uiline);border-left-width:4px;border-radius:7px;padding:11px 14px;margin-bottom:10px}
+  .insL.crit{border-left-color:var(--bad)} .insL.wrn{border-left-color:var(--warn)} .insL.pos{border-left-color:var(--ok)}
+  .insL .hd{display:flex;align-items:center;gap:9px}
+  .insL .hd b{font-size:12.5px}
+  .insL .body{font-size:10.8px;color:#33485a;margin:5px 0 7px;max-width:640px;line-height:1.5}
+  .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .abtn{font-size:9.5px;font-weight:600;border-radius:5px;padding:4px 10px;border:1px solid var(--uiline);color:var(--ink);background:#fff}
+  .abtn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+  .abtn.link{border:0;color:var(--pillar);padding:4px 4px}
+  .gen{font-family:ui-monospace,monospace;font-size:8px;color:var(--muted);margin-top:7px;letter-spacing:.4px}
+  .fchip{border:1px solid var(--uiline);background:#fff;border-radius:14px;padding:3px 11px;font-size:10px;color:var(--muted)}
+  .fchip.on{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:600}
+
+  /* chat */
+  .chat{display:flex;flex-direction:column;gap:9px;max-width:640px}
+  .bub{border-radius:10px;padding:8px 12px;font-size:11px;line-height:1.5;max-width:86%}
+  .bub.me{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:3px}
+  .bub.ai{align-self:flex-start;background:#fff;border:1px solid var(--uiline);border-bottom-left-radius:3px}
+  .bub.ai ul{margin:4px 0 2px;padding-left:16px}
+  .bub.ai li{margin:3px 0}
+  .scite{display:inline-flex;gap:3px;margin-left:5px;vertical-align:middle}
+  .scite i{font-style:normal;font-family:ui-monospace,monospace;font-size:7px;color:var(--accent2);background:#e9f5f6;border:1px solid #c4e2e6;border-radius:3px;padding:0 4px}
+  .meta-ai{font-family:ui-monospace,monospace;font-size:7.5px;color:var(--muted);margin-top:6px;letter-spacing:.4px}
+  .sugg{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+  .sugg span{font-size:9.5px;color:var(--pillar);border:1px dashed #ccdaf8;background:#f6f9ff;border-radius:13px;padding:3px 10px}
+
+  /* agentic */
+  .sandbar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:9.5px}
+  .sand{font-family:ui-monospace,monospace;font-size:8px;letter-spacing:.5px;border-radius:3px;padding:2px 7px;border:1px solid #c4e2e6;background:#e9f5f6;color:var(--accent2)}
+  .iframe-zone{border:2px dashed var(--pillar);border-radius:8px;background:#f6f9ff;padding:14px;position:relative}
+  .iframe-tag{position:absolute;top:-9px;left:14px;background:var(--pillar);color:#fff;font-family:ui-monospace,monospace;font-size:7.5px;letter-spacing:1px;padding:2px 8px;border-radius:3px}
+  .agen{background:#fff;border:1px solid var(--uiline);border-radius:8px;padding:14px;font-family:Georgia,serif}
+  .agen .big{font-size:30px;font-weight:700;letter-spacing:-.5px}
+  .agen .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;margin-top:10px}
+  .agen .cell{border:1px solid var(--uiline);border-radius:6px;padding:9px 11px;font-size:10.5px}
+  .agen .cell b{display:block;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-family:Inter,system-ui,sans-serif;margin-bottom:4px}
+
+  /* ============ phone frame ============ */
+  .phones{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+  .phone{width:296px;flex:none;background:#0d1b27;border-radius:36px;padding:10px;box-shadow:0 18px 40px rgba(15,34,51,.25)}
+  .scr{background:var(--uibg);border-radius:27px;overflow:hidden;display:flex;flex-direction:column;height:602px;font-size:11px}
+  .stbar{height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-family:ui-monospace,monospace;font-size:9.5px;font-weight:700;color:var(--ink)}
+  .mtop{background:var(--ink);color:#fff;padding:9px 13px 10px}
+  .mtop .r1{display:flex;align-items:center;gap:8px}
+  .mtop .r1 b{font-size:13.5px}
+  .mtop .ent{margin-left:auto;background:#1c3954;border:1px solid #2c4d6c;border-radius:11px;font-size:9px;padding:2px 8px;color:#dbe7f1}
+  .mtop .r2{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:8.5px;color:#9fb4c7}
+  .mbody{flex:1;overflow:hidden;padding:9px 10px;display:flex;flex-direction:column;gap:8px}
+  .mk{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .mkpi{background:#fff;border:1px solid var(--uiline);border-radius:7px;padding:7px 9px}
+  .mkpi .lab{font-family:ui-monospace,monospace;font-size:7px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+  .mkpi .val{font-size:15.5px;font-weight:800;margin-top:1px}
+  .mkpi .sub{font-size:8px;color:var(--muted)}
+  .mins{background:#fff;border:1px solid var(--uiline);border-radius:7px;padding:7px 9px;border-left-width:3px}
+  .mins.crit{border-left-color:var(--bad)} .mins.wrn{border-left-color:var(--warn)} .mins.pos{border-left-color:var(--ok)}
+  .mins p{margin:1px 0 0;font-size:9.5px;line-height:1.4}
+  .mins .sev{font-family:ui-monospace,monospace;font-size:6.5px;letter-spacing:1px;font-weight:700}
+  .mins.crit .sev{color:var(--bad)} .mins.wrn .sev{color:var(--warn)} .mins.pos .sev{color:var(--ok)}
+  .mask{margin-top:auto;background:#fff;border:1.3px solid var(--ink);border-radius:18px;padding:7px 12px;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .mask b{margin-left:auto;color:var(--accent);font-size:12px}
+  .mtab{display:flex;border-top:1px solid var(--uiline);background:#fff}
+  .mtab span{flex:1;text-align:center;padding:8px 0 10px;font-size:8.5px;color:var(--muted)}
+  .mtab span.on{color:var(--accent);font-weight:700}
+  .mtab i{display:block;width:15px;height:15px;border:1.6px solid currentColor;border-radius:4px;margin:0 auto 3px;opacity:.8}
+
+  /* ============ style-guide swatches ============ */
+  .pal{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 4px}
+  .swl{flex:0 0 128px;border:1px solid var(--hair);border-radius:6px;overflow:hidden;background:#fff}
+  .swl .c{height:44px}
+  .swl .t{padding:6px 9px;font-size:10px;line-height:1.4}
+  .swl .t b{display:block;font-size:10.5px}
+  .swl .t code{font-family:ui-monospace,monospace;font-size:9px;color:var(--muted)}
+  .comp{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#fff;border:1px solid var(--hair);border-radius:6px;padding:13px 15px;margin-top:10px}
+  .cbtn{font-size:11px;font-weight:700;border-radius:6px;padding:7px 16px;border:1.4px solid transparent}
+  .cb-pri{background:var(--accent);color:#fff}
+  .cb-navy{background:var(--ink);color:#fff}
+  .cb-ghost{background:#fff;border-color:var(--uiline);color:var(--ink)}
+  .cb-ok{background:var(--ok);color:#fff}
+  .cdiv{width:1px;height:26px;background:var(--hair)}
+
+  /* widget map table */
+  .map{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden}
+  .map th{background:var(--ink);color:#fff;text-align:left;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-family:ui-monospace,monospace;padding:8px 12px;font-weight:600}
+  .map td{padding:8px 12px;border-bottom:1px solid var(--uiline);vertical-align:top}
+  .map tr:last-child td{border-bottom:0}
+  .map td:first-child{font-weight:600}
+  .map .rm{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--pillar);background:#eef3ff;border:1px solid #ccdaf8;border-radius:3px;padding:1px 7px;white-space:nowrap}
+  .map .cad{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--muted);white-space:nowrap}
+
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    .browser,.phone{box-shadow:none}
+    .shot,.browser,.phone,.notes{break-inside:avoid}
+    h2.section{break-after:avoid}
+    .stamp{opacity:.6}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc">
+    <div class="stamp">UI MOCKUP<br>CEO MODULE<br>REV A</div>
+    <div class="sub">Ulticon Builders, Inc. · Omega Asia · Construction Suite</div>
+    <h1>CEO / Office of the President — UI Mockups</h1>
+    <div class="meta">
+      Annotated design frames for the suite's primary output: the <b>ManCom dashboard</b> and its
+      companions — <b>AI Insights</b>, <b>Ask AI</b> (conversational), the <b>Agentic View</b> host shell,
+      and the <b>mobile ManCom</b>. Drawn in the brand light UI (navy chrome · orange action · teal data).
+      Numbered orange dots <span class="n" style="position:static">1</span> in each frame match the notes
+      beside it. Open in any browser; Print → Save as PDF to share.
+    </div>
+  </header>
+
+  <!-- ================= 00 DESIGN LANGUAGE ================= -->
+  <h2 class="section" data-n="00">Design Language</h2>
+  <p class="lead">One palette across documents and product: the same navy / orange / teal as <code>diagrams.html</code>, applied as a clean light app UI. Conventions every screen reuses.</p>
+
+  <div class="pal">
+    <div class="swl"><div class="c" style="background:#0f2233"></div><div class="t"><b>Ink navy</b><code>#0F2233</code> chrome · headers</div></div>
+    <div class="swl"><div class="c" style="background:#c2410c"></div><div class="t"><b>Flag orange</b><code>#C2410C</code> primary action · alerts</div></div>
+    <div class="swl"><div class="c" style="background:#0e7490"></div><div class="t"><b>Data teal</b><code>#0E7490</code> charts · evidence</div></div>
+    <div class="swl"><div class="c" style="background:#1d4ed8"></div><div class="t"><b>Pillar blue</b><code>#1D4ED8</code> AI · read-model tags</div></div>
+    <div class="swl"><div class="c" style="background:#15803d"></div><div class="t"><b>OK green</b><code>#15803D</code> on-time · ahead</div></div>
+    <div class="swl"><div class="c" style="background:#b45309"></div><div class="t"><b>Warn amber</b><code>#B45309</code> pending · lagging</div></div>
+    <div class="swl"><div class="c" style="background:#b91c1c"></div><div class="t"><b>Bad red</b><code>#B91C1C</code> slippage · escalated</div></div>
+    <div class="swl"><div class="c" style="background:#f3f5f7;border-bottom:1px solid #e3e8ee"></div><div class="t"><b>App canvas</b><code>#F3F5F7</code> white cards on soft grey</div></div>
+  </div>
+
+  <div class="comp ui">
+    <button class="cbtn cb-pri">Primary action</button>
+    <button class="cbtn cb-navy">Secondary</button>
+    <button class="cbtn cb-ghost">Ghost</button>
+    <button class="cbtn cb-ok">Approve ✓</button>
+    <span class="cdiv"></span>
+    <span class="st st-ok">on-time</span>
+    <span class="st st-warn">pending 6d</span>
+    <span class="st st-bad">escalated</span>
+    <span class="st st-info">aggregate only</span>
+    <span class="cdiv"></span>
+    <span class="src">SRC · engineering.swa</span>
+    <span class="evi" style="display:inline-flex"><i>DR log wk22–24</i></span>
+    <span class="mchip mc-proj">→ −2.9% Jul (proj.)</span>
+  </div>
+  <figcaption>FIG 00 · Core components — buttons, status chips, a read-model source tag (blue), an evidence chip (teal), and a projection chip (dashed orange, shown only when Trend Projection is ON).</figcaption>
+
+  <div class="note"><b>Three conventions repeated everywhere:</b> ① <b>solid = actual, dashed = projected, grey = plan</b> on every chart and chip; ② every widget carries a blue <b>SRC tag</b> naming the Pillar-3 read-model it consumes — the dashboard doubles as the data-contract spec; ③ AI output is always <b>grounded</b>: an insight or chat answer without evidence chips does not ship.</div>
+
+  <!-- ================= 01 MANCOM DASHBOARD ================= -->
+  <h2 class="section" data-n="01">ManCom — Live Dashboard</h2>
+  <p class="lead">The President's landing page. Everything every department produces rolls up here through the AI-queryable layer; Operations vets most of it on the way. KPI band → trend charts → flagged projects + report feed, with AI riding in the right rail.</p>
+
+  <div class="shot stack">
+    <div class="art">
+      <div class="browser ui">
+        <div class="bbar"><div class="bdots"><i></i><i></i><i></i></div><div class="burl">suite.ulticon.ph/ceo/mancom</div></div>
+        <div class="shell">
+
+          <!-- sidebar -->
+          <div class="side">
+            <div class="sbrand"><div class="slogo">U</div><div class="t"><b>UBI Suite</b><span>Construction</span></div></div>
+            <div class="sentity"><span>Entity</span> <b>UBI ▾</b> <span class="n">1</span></div>
+            <div class="sgrp">Office of the President</div>
+            <div class="sitem on"><span class="ico"></span> ManCom</div>
+            <div class="sitem"><span class="ico"></span> AI Insights <span class="bdg">3</span></div>
+            <div class="sitem"><span class="ico"></span> Ask AI</div>
+            <div class="sitem"><span class="ico"></span> Agentic View</div>
+            <div class="sgrp">Departments</div>
+            <div class="sitem dim"><span class="ico"></span> Operations</div>
+            <div class="sitem dim"><span class="ico"></span> Engineering</div>
+            <div class="sitem dim"><span class="ico"></span> Procurement</div>
+            <div class="sitem dim"><span class="ico"></span> Survey</div>
+            <div class="sitem dim"><span class="ico"></span> MQC</div>
+            <div class="sitem dim"><span class="ico"></span> Audit</div>
+            <div class="smore">+ 8 more…</div>
+            <div class="suser"><div class="av">EC</div><div class="who"><b>E. Castillo</b><span>President &amp; CEO · cross-entity read</span></div></div>
+          </div>
+
+          <!-- main -->
+          <div class="main">
+            <div class="top">
+              <h3>ManCom</h3>
+              <div class="per"><span class="pchip">May</span><span class="pchip on">June 2026 ▾</span></div>
+              <div class="right">
+                <span class="toggle"><span class="tg"></span> Project trends forward <span class="n">2</span></span>
+                <span class="asof"><i></i> live · as of Jun 11, 10:42</span>
+              </div>
+            </div>
+
+            <div class="kpis">
+              <div class="kpi"><div class="lab">Active projects</div><div class="val">104 <span class="mchip mc-bad">6 ⚑</span></div><div class="sub">98 DPWH pkgs · 6 flagged by Operations</div></div>
+              <div class="kpi"><div class="lab">Billings — June</div><div class="val">₱182.4M <span class="d-up">▲ 12%</span></div><div class="sub">21 of 34 monthly drafts submitted</div></div>
+              <div class="kpi"><div class="lab">Avg slippage</div><div class="val">−2.31% <span class="mchip mc-proj">→ −2.9% Jul</span> <span class="n">3</span></div><div class="sub">3 projects below −5%</div></div>
+              <div class="kpi"><div class="lab">Open exceptions</div><div class="val">7 <span class="mchip mc-bad">2 escalated</span></div><div class="sub">Audit investigation tracker</div></div>
+            </div>
+
+            <div class="grid2">
+              <div class="panel chart">
+                <div class="ph"><b>Accomplishment vs plan — cumulative ₱M</b> <span class="n">4</span> <span class="src">SRC · engineering.swa+billing</span></div>
+                <svg viewBox="0 0 430 168" xmlns="http://www.w3.org/2000/svg">
+                  <g font-family="Inter,system-ui,sans-serif">
+                    <line x1="36" y1="140" x2="416" y2="140" stroke="#e3e8ee"/>
+                    <line x1="36" y1="84" x2="416" y2="84" stroke="#eef2f5"/>
+                    <line x1="36" y1="28" x2="416" y2="28" stroke="#eef2f5"/>
+                    <text x="30" y="143" text-anchor="end" font-size="8" fill="#5b6b7a">0</text>
+                    <text x="30" y="87" text-anchor="end" font-size="8" fill="#5b6b7a">600</text>
+                    <text x="30" y="31" text-anchor="end" font-size="8" fill="#5b6b7a">1.2k</text>
+                    <!-- today divider -->
+                    <line x1="305" y1="18" x2="305" y2="140" stroke="#b9c6d1" stroke-dasharray="3 3"/>
+                    <text x="305" y="13" text-anchor="middle" font-size="7.5" fill="#5b6b7a" font-family="ui-monospace,monospace">TODAY</text>
+                    <rect x="305" y="18" width="111" height="122" fill="#c2410c" opacity=".045"/>
+                    <!-- plan -->
+                    <polyline points="40,128 93,114 146,98 199,80 252,62 305,48 358,38 411,28" fill="none" stroke="#9aa9b6" stroke-width="2"/>
+                    <!-- actual -->
+                    <polyline points="40,131 93,120 146,107 199,92 252,79 305,70" fill="none" stroke="#0e7490" stroke-width="2.6"/>
+                    <circle cx="305" cy="70" r="3" fill="#0e7490"/>
+                    <!-- projection -->
+                    <polyline points="305,70 358,62 411,55" fill="none" stroke="#c2410c" stroke-width="2.4" stroke-dasharray="6 4"/>
+                    <!-- widening gap marker -->
+                    <line x1="411" y1="28" x2="411" y2="55" stroke="#b91c1c" stroke-width="1.4"/>
+                    <text x="406" y="45" text-anchor="end" font-size="7.5" fill="#b91c1c" font-weight="700">gap widens</text>
+                    <g font-size="7.5" fill="#5b6b7a">
+                      <text x="40" y="152" text-anchor="middle">Jan</text><text x="93" y="152" text-anchor="middle">Feb</text>
+                      <text x="146" y="152" text-anchor="middle">Mar</text><text x="199" y="152" text-anchor="middle">Apr</text>
+                      <text x="252" y="152" text-anchor="middle">May</text><text x="305" y="152" text-anchor="middle">Jun</text>
+                      <text x="358" y="152" text-anchor="middle">Jul</text><text x="411" y="152" text-anchor="middle">Aug</text>
+                    </g>
+                  </g>
+                </svg>
+                <div class="lgnd">
+                  <span><i class="lk" style="border-color:#9aa9b6"></i> plan</span>
+                  <span><i class="lk" style="border-color:#0e7490"></i> actual</span>
+                  <span><i class="lk" style="border-color:#c2410c;border-top-style:dashed"></i> projected (3-mo trend)</span>
+                </div>
+              </div>
+
+              <div class="panel chart">
+                <div class="ph"><b>Survey volumes — monthly m³ ×1000</b> <span class="src">SRC · survey.volumes</span></div>
+                <svg viewBox="0 0 430 168" xmlns="http://www.w3.org/2000/svg">
+                  <g font-family="Inter,system-ui,sans-serif">
+                    <line x1="36" y1="140" x2="416" y2="140" stroke="#e3e8ee"/>
+                    <line x1="36" y1="84" x2="416" y2="84" stroke="#eef2f5"/>
+                    <line x1="36" y1="28" x2="416" y2="28" stroke="#eef2f5"/>
+                    <text x="30" y="143" text-anchor="end" font-size="8" fill="#5b6b7a">0</text>
+                    <text x="30" y="87" text-anchor="end" font-size="8" fill="#5b6b7a">40</text>
+                    <text x="30" y="31" text-anchor="end" font-size="8" fill="#5b6b7a">80</text>
+                    <g>
+                      <rect x="52" y="78" width="34" height="62" fill="#0e7490" opacity=".85"/>
+                      <rect x="104" y="64" width="34" height="76" fill="#0e7490" opacity=".85"/>
+                      <rect x="156" y="58" width="34" height="82" fill="#0e7490" opacity=".85"/>
+                      <rect x="208" y="70" width="34" height="70" fill="#0e7490" opacity=".85"/>
+                      <rect x="260" y="50" width="34" height="90" fill="#0e7490" opacity=".85"/>
+                      <rect x="312" y="96" width="34" height="44" fill="#7ec3d2"/>
+                      <text x="329" y="92" text-anchor="middle" font-size="7" fill="#5b6b7a">to date</text>
+                      <rect x="364" y="54" width="34" height="86" fill="none" stroke="#c2410c" stroke-width="1.8" stroke-dasharray="5 3"/>
+                      <text x="381" y="50" text-anchor="middle" font-size="7" fill="#c2410c" font-weight="700">proj.</text>
+                    </g>
+                    <g font-size="7.5" fill="#5b6b7a">
+                      <text x="69" y="152" text-anchor="middle">Jan</text><text x="121" y="152" text-anchor="middle">Feb</text>
+                      <text x="173" y="152" text-anchor="middle">Mar</text><text x="225" y="152" text-anchor="middle">Apr</text>
+                      <text x="277" y="152" text-anchor="middle">May</text><text x="329" y="152" text-anchor="middle">Jun</text>
+                      <text x="381" y="152" text-anchor="middle">Jul</text>
+                    </g>
+                  </g>
+                </svg>
+                <div class="lgnd">
+                  <span><i class="lk" style="border-color:#0e7490"></i> reported</span>
+                  <span><i class="lk" style="border-color:#7ec3d2"></i> month to date</span>
+                  <span><i class="lk" style="border-color:#c2410c;border-top-style:dashed"></i> projected</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid2">
+              <div class="panel">
+                <div class="ph"><b>Flagged projects</b> <span class="n">5</span> <span class="src">SRC · operations.health</span></div>
+                <table class="tbl">
+                  <tr><th>Project</th><th>PE / PM</th><th>Slip</th><th>Trend</th><th>Proj. Jul</th></tr>
+                  <tr>
+                    <td>Pkg 5 · Daang Maharlika Rehab K1440</td><td>dela Cruz / Uy</td>
+                    <td class="neg">−4.6%</td>
+                    <td><svg width="56" height="16" viewBox="0 0 56 16"><polyline points="2,5 13,6 24,8 35,10 46,12 54,14" fill="none" stroke="#b91c1c" stroke-width="1.6"/></svg></td>
+                    <td><span class="st st-bad">−6.2%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Pkg 2 · Iligan Coastal Diversion</td><td>Ramos / Lim</td>
+                    <td class="neg">−1.2%</td>
+                    <td><svg width="56" height="16" viewBox="0 0 56 16"><polyline points="2,11 13,12 24,10 35,9 46,8 54,7" fill="none" stroke="#b45309" stroke-width="1.6"/></svg></td>
+                    <td><span class="st st-warn">−0.8%</span></td>
+                  </tr>
+                  <tr>
+                    <td>Pkg 11 · Bukidnon Boundary Rd</td><td>Santos / Go</td>
+                    <td class="pos">+3.1%</td>
+                    <td><svg width="56" height="16" viewBox="0 0 56 16"><polyline points="2,12 13,11 24,9 35,7 46,5 54,3" fill="none" stroke="#15803d" stroke-width="1.6"/></svg></td>
+                    <td><span class="st st-ok">+3.4%</span></td>
+                  </tr>
+                </table>
+              </div>
+
+              <div class="panel">
+                <div class="ph"><b>Department report feed</b> <span class="n">6</span> <span class="src">SRC · *.report-status</span></div>
+                <table class="tbl">
+                  <tr><td>Engineering — SWA wk 24</td><td style="text-align:right"><span class="st st-ok">on-time</span></td></tr>
+                  <tr><td>Survey — May volumes</td><td style="text-align:right"><span class="st st-ok">received</span></td></tr>
+                  <tr><td>MQC — certs for Billing No. 7</td><td style="text-align:right"><span class="st st-warn">2 pending · 6d</span></td></tr>
+                  <tr><td>Procurement — DR sync</td><td style="text-align:right"><span class="st st-ok">14 today</span></td></tr>
+                  <tr><td>Operations — approvals queue</td><td style="text-align:right"><span class="st st-warn">8 waiting</span></td></tr>
+                  <tr><td>Audit — exceptions</td><td style="text-align:right"><span class="st st-bad">2 escalated</span></td></tr>
+                  <tr><td>Clinic — June health summary <span class="n">7</span></td><td style="text-align:right"><span class="st st-info">aggregate only</span></td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- right rail -->
+          <div class="rail">
+            <div class="railh">AI Insights <span class="n">8</span> <a>view all →</a></div>
+            <div class="ins crit"><div class="sev">● CRITICAL</div><p><b>Pkg 5 trends to −6.2% by July.</b> Cement deliveries late 3 straight weeks; Item 311 SWA gap growing.</p><div class="evi"><i>Proc · DR log</i><i>Eng · SWA 22–24</i></div></div>
+            <div class="ins wrn"><div class="sev">● WARNING</div><p><b>Billing No. 7 (Pkg 2) blocked</b> — 2 MQC certs pending 6 days.</p><div class="evi"><i>MQC · certs</i><i>Eng · billing</i></div></div>
+            <div class="ins pos"><div class="sev">● POSITIVE</div><p><b>Pkg 11 ahead 6 straight weeks</b> — billing could move earlier.</p><div class="evi"><i>Eng · SWA</i></div></div>
+            <div class="askdock">
+              <div class="railh" style="margin-bottom:6px">Ask AI <span class="n">9</span></div>
+              <p class="q">"Why is Package 5 slipping?" — answered 09:12</p>
+              <div class="askin">Ask about any project or department… <b>➤</b></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <figcaption>FIG 01 · ManCom live dashboard — desktop, 1280px class. Trend projection ON.</figcaption>
+    </div>
+
+    <div class="notes">
+      <h4>Design notes</h4>
+      <ol>
+        <li><span class="n">1</span><span><b>Entity switcher.</b> UBI / Omega Asia / All-consolidated. Every query below is entity-scoped (hard rule); "All" is a CEO-only privilege.</span></li>
+        <li><span class="n">2</span><span><b>Trend-projection toggle</b> — the spec's checkbox. ON extends every chart forward on recent trend and reveals dashed "proj." chips. One control governs the whole page.</span></li>
+        <li><span class="n">3</span><span><b>Projection chips</b> use dashed orange borders so forecast is never confusable with fact.</span></li>
+        <li><span class="n">4</span><span><b>Charts:</b> grey = plan, teal solid = actual, orange dashed = projected. The red "gap widens" marker is the negative-slippage early warning from the spec.</span></li>
+        <li><span class="n">5</span><span><b>Flagged projects</b> come pre-vetted from Operations (first-stop rectification) — the CEO sees the residue, not the noise.</span></li>
+        <li><span class="n">6</span><span><b>Report feed</b> tracks each department's submission status; "late report" rows are exactly what the AI-insights agent feeds on.</span></li>
+        <li><span class="n">7</span><span><b>Clinic row is aggregate-only</b>, enforced by RBAC at the read-model — never individual medical detail.</span></li>
+        <li><span class="n">8</span><span><b>AI rail</b> shows top-3 by severity, each grounded with teal evidence chips. Full list lives in the AI Insights page (FIG 03).</span></li>
+        <li><span class="n">9</span><span><b>Ask-AI dock</b> is persistent — one tap from any KPI to a conversation (FIG 04).</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ================= 02 PROJECTION OFF/ON ================= -->
+  <h2 class="section" data-n="02">Trend Projection — OFF vs ON</h2>
+  <p class="lead">The same chart in both toggle states. OFF is the factual record; ON answers "where does this trajectory land?" by extending the last three months of trend — the spec's "negative slippage next month" call-out made visual.</p>
+
+  <div class="shot">
+    <div class="art" style="display:flex;gap:14px;flex-wrap:wrap">
+      <div class="panel chart ui" style="flex:1 1 300px">
+        <div class="ph"><b style="font-size:11px">Projection OFF — history only</b> <span class="toggle" style="margin-left:auto"><span class="tg off"></span> off</span></div>
+        <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="108" x2="306" y2="108" stroke="#e3e8ee"/>
+          <polyline points="24,98 71,88 118,76 165,62 212,50 259,40" fill="none" stroke="#9aa9b6" stroke-width="2"/>
+          <polyline points="24,101 71,92 118,82 165,70 212,60 259,53" fill="none" stroke="#0e7490" stroke-width="2.6"/>
+          <circle cx="259" cy="53" r="3" fill="#0e7490"/>
+          <text x="259" y="122" font-size="7.5" fill="#5b6b7a" text-anchor="middle" font-family="Inter,system-ui,sans-serif">Jun (today)</text>
+        </svg>
+      </div>
+      <div class="panel chart ui" style="flex:1 1 300px">
+        <div class="ph"><b style="font-size:11px">Projection ON — trajectory revealed</b> <span class="toggle" style="margin-left:auto"><span class="tg"></span> on</span></div>
+        <svg viewBox="0 0 320 130" xmlns="http://www.w3.org/2000/svg">
+          <line x1="20" y1="108" x2="306" y2="108" stroke="#e3e8ee"/>
+          <rect x="259" y="14" width="47" height="94" fill="#c2410c" opacity=".05"/>
+          <line x1="259" y1="14" x2="259" y2="108" stroke="#b9c6d1" stroke-dasharray="3 3"/>
+          <polyline points="24,98 71,88 118,76 165,62 212,50 259,40 304,30" fill="none" stroke="#9aa9b6" stroke-width="2"/>
+          <polyline points="24,101 71,92 118,82 165,70 212,60 259,53" fill="none" stroke="#0e7490" stroke-width="2.6"/>
+          <polyline points="259,53 304,47" fill="none" stroke="#c2410c" stroke-width="2.4" stroke-dasharray="6 4"/>
+          <line x1="304" y1="30" x2="304" y2="47" stroke="#b91c1c" stroke-width="1.4"/>
+          <text x="299" y="42" text-anchor="end" font-size="7.5" fill="#b91c1c" font-weight="700" font-family="Inter,system-ui,sans-serif">−slippage</text>
+        </svg>
+      </div>
+    </div>
+    <div class="notes">
+      <h4>Design notes</h4>
+      <ol>
+        <li><span class="n">1</span><span><b>One global toggle</b>, not per-chart — the CEO flips one switch and the entire page leans forward.</span></li>
+        <li><span class="n">2</span><span><b>Method is honest and simple:</b> linear extension of the last 3 months (accrual/forecast). The tooltip names the method; no black-box forecasting in v1.</span></li>
+        <li><span class="n">3</span><span><b>State persists</b> per user. Print/export renders whichever state is showing — useful for the physical ManCom deck.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ================= 03 AI INSIGHTS ================= -->
+  <h2 class="section" data-n="03">AI Insights — Full View</h2>
+  <p class="lead">The auto-surfaced register: delays, good/poor performance, bottlenecks. Generated off-box by the insights agent reading every module's Pillar-3 read-model; each card is grounded, severity-ranked, and routes into an existing workflow.</p>
+
+  <div class="shot">
+    <div class="art">
+      <div class="browser ui">
+        <div class="bbar"><div class="bdots"><i></i><i></i><i></i></div><div class="burl">suite.ulticon.ph/ceo/insights</div></div>
+        <div class="shell" style="min-height:0">
+          <div class="main" style="padding:16px 20px 20px">
+            <div class="top">
+              <h3>AI Insights</h3>
+              <div class="right"><span class="asof"><i></i> last run 07:00 · next 13:00 · <a style="color:var(--pillar)">run now</a> <span class="n">1</span></span></div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 10px">
+              <span class="fchip on">All (9)</span><span class="fchip">Critical (1)</span><span class="fchip">Warning (5)</span><span class="fchip">Positive (3)</span>
+              <span class="cdiv" style="height:20px"></span>
+              <span class="fchip">All departments ▾</span><span class="fchip">This week ▾</span>
+            </div>
+
+            <div class="insL crit">
+              <div class="hd"><span class="st st-bad">CRITICAL</span><b>Pkg 5 trends to −6.2% slippage by July</b><span class="src" style="margin-left:auto">SRC · cross-module</span></div>
+              <div class="body">Cement deliveries from <b>Solid Mix Corp</b> arrived late 3 consecutive weeks (avg 2.4 days). PCCP pours on Item 311 are 1,180 m² behind program; the weekly SWA gap has widened each week since wk 22. At current trend the package crosses the −5% DPWH attention threshold in the first week of July. <span class="n">2</span></div>
+              <div class="evi" style="margin-bottom:8px"><i>Procurement · DR log wk22–24</i><i>Engineering · SWA wk22–24</i><i>Survey · vol Δ STA 4+200–5+600</i></div>
+              <div class="acts"><span class="n">3</span><button class="abtn pri">View evidence</button><button class="abtn">Send to VPO</button><button class="abtn">Raise Audit exception</button><button class="abtn link">Dismiss</button></div>
+              <div class="gen">generated 07:00 by insights agent (off-box) · confidence HIGH · model run #214</div>
+            </div>
+
+            <div class="insL wrn">
+              <div class="hd"><span class="st st-warn">WARNING</span><b>Billing No. 7 (Pkg 2) blocked by MQC certs</b></div>
+              <div class="body">2 material certificates (Item 311 beam tests) pending 6 days. Billing draft is otherwise complete — certs are the only missing attachment.</div>
+              <div class="evi" style="margin-bottom:8px"><i>MQC · cert queue</i><i>Engineering · billing №7</i><i>Doc-Tracking · DOC-2026-04187</i></div>
+              <div class="acts"><button class="abtn pri">View evidence</button><button class="abtn">Nudge MQC</button><button class="abtn link">Dismiss</button></div>
+            </div>
+
+            <div class="insL wrn">
+              <div class="hd"><span class="st st-warn">WARNING</span><b>4 vehicle registrations expire within 15 days</b></div>
+              <div class="body">Records expiry monitor: 3 dump trucks (Pkg 5 haul fleet) + 1 service vehicle. Renewal lead time averages 9 days.</div>
+              <div class="evi" style="margin-bottom:8px"><i>Records · expiry register</i></div>
+              <div class="acts"><button class="abtn pri">View list</button><button class="abtn">Notify Records</button><button class="abtn link">Dismiss</button></div>
+            </div>
+
+            <div class="insL pos">
+              <div class="hd"><span class="st st-ok">POSITIVE</span><b>Pkg 11 ahead of plan 6 consecutive weeks</b> <span class="n">4</span></div>
+              <div class="body">+3.1% and climbing; subbase complete 3 weeks early. Consider advancing Billing No. 4 and reallocating one grader to Pkg 5.</div>
+              <div class="evi" style="margin-bottom:8px"><i>Engineering · SWA</i><i>Operations · health</i></div>
+              <div class="acts"><button class="abtn pri">View project</button><button class="abtn link">Dismiss</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>FIG 03 · AI Insights register — severity-filtered list; every card grounded and actionable.</figcaption>
+    </div>
+
+    <div class="notes">
+      <h4>Design notes</h4>
+      <ol>
+        <li><span class="n">1</span><span><b>Off-box cadence is visible.</b> The agent runs on the HCI/workstation schedule (07:00 / 13:00); "run now" queues a fresh pass. The API box never does inference (hard rule 1).</span></li>
+        <li><span class="n">2</span><span><b>Narrative + numbers.</b> Each insight reads as one paragraph a President can forward verbatim, with the quantified cause chain inside.</span></li>
+        <li><span class="n">3</span><span><b>Actions route into existing workflows</b> — VPO inbox, Audit exception register, module deep-links. Insights never dead-end.</span></li>
+        <li><span class="n">4</span><span><b>Good news is first-class.</b> The spec asks for good <i>and</i> poor performance; positive cards carry reallocation suggestions, not just praise.</span></li>
+        <li><span class="n">5</span><span><b>Dismissals are logged</b> (who/when) so the Audit module can review what leadership chose to ignore.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ================= 04 ASK AI ================= -->
+  <h2 class="section" data-n="04">Ask AI — Conversational View</h2>
+  <p class="lead">The CEO's "what's happening?" box. The agent answers across the whole suite by querying each module's read-model — every claim cited, every answer RBAC-scoped.</p>
+
+  <div class="shot">
+    <div class="art">
+      <div class="browser ui">
+        <div class="bbar"><div class="bdots"><i></i><i></i><i></i></div><div class="burl">suite.ulticon.ph/ceo/ask</div></div>
+        <div class="shell" style="min-height:0">
+          <div class="main" style="padding:16px 20px 20px">
+            <div class="top" style="margin-bottom:4px"><h3>Ask AI</h3><div class="right"><span class="st st-info">scope: cross-entity read · clinic aggregate-only</span> <span class="n">1</span></div></div>
+            <div class="chat">
+              <div class="bub me">What's happening?</div>
+              <div class="bub ai">
+                Across 104 active projects today: <span class="n">2</span>
+                <ul>
+                  <li><b>Billing pace is healthy</b> — ₱182.4M drafted, 21/34 submitted, tracking +12% vs May.<span class="scite"><i>Eng</i></span></li>
+                  <li><b>Pkg 5 is the main risk</b> — late cement 3 straight weeks, projected −6.2% by July.<span class="scite"><i>Proc</i><i>Eng</i><i>Survey</i></span></li>
+                  <li><b>8 approvals waiting at VPO</b> — oldest is a Pkg 7 subcontract, 4 days.<span class="scite"><i>Ops</i></span></li>
+                </ul>
+                <div class="meta-ai">answered from 9 read-models · 10:42 · agent off-box · sources expandable</div>
+              </div>
+              <div class="bub me">Why is Package 5 slipping?</div>
+              <div class="bub ai">
+                Three linked causes: <b>Solid Mix Corp</b> delivered cement late 3 consecutive weeks (avg 2.4 days)<span class="scite"><i>Proc · DR</i></span> → PCCP pours on Item 311 fell 1,180 m² behind program<span class="scite"><i>Eng · SWA</i></span> → measured volume at STA 4+200–5+600 confirms the gap<span class="scite"><i>Survey</i></span>. Procurement has flagged the supplier; an alternate is under canvass. <span class="n">3</span>
+                <div class="meta-ai">open: DR log · SWA wk24 · supplier scorecard</div>
+              </div>
+              <div class="sugg"><span class="n">4</span><span>Which billings are at risk this month?</span><span>Top 5 suppliers by delay</span><span>Approvals older than 3 days</span></div>
+              <div class="askin" style="max-width:640px">Ask anything across the suite… <b>➤</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <figcaption>FIG 04 · Ask AI — grounded conversational answers over the Pillar-3 query surface.</figcaption>
+    </div>
+
+    <div class="notes">
+      <h4>Design notes</h4>
+      <ol>
+        <li><span class="n">1</span><span><b>Scope banner is permanent.</b> Answers are generated under the caller's RBAC; the clinic guard (aggregate-only) is enforced at the read-model, and the banner says so.</span></li>
+        <li><span class="n">2</span><span><b>"What's happening?" returns a digest, not a dump</b> — three decisions-worth of signal, each line citing its source modules with teal chips that expand to raw records.</span></li>
+        <li><span class="n">3</span><span><b>Cause chains cite each hop.</b> Delivery → pour → measured volume mirrors how the data actually flows between modules (DFD P1→P2).</span></li>
+        <li><span class="n">4</span><span><b>Suggested prompts teach the surface.</b> Seeded from what the read-models can actually answer well — they double as the query-layer test suite.</span></li>
+        <li><span class="n">5</span><span><b>Same agent, three skins:</b> the rail dock (FIG 01), this page, and mobile (FIG 06) hit one conversation API.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ================= 05 AGENTIC VIEW ================= -->
+  <h2 class="section" data-n="05">Agentic View — Sandboxed Host Shell</h2>
+  <p class="lead">The "statically dynamic" page: an off-box agent generates fresh dashboard HTML on its own schedule; the host shell loads it in a strict sandbox. The frame below mocks the <b>host contract</b> — the agent-generated content inside is deliberately styled differently, because the agent owns that design.</p>
+
+  <div class="shot">
+    <div class="art">
+      <div class="browser ui">
+        <div class="bbar"><div class="bdots"><i></i><i></i><i></i></div><div class="burl">suite.ulticon.ph/ceo/agentic</div></div>
+        <div class="shell" style="min-height:0">
+          <div class="main" style="padding:16px 20px 20px">
+            <div class="top">
+              <h3>Agentic View</h3>
+              <div class="right">
+                <span class="asof"><i></i> generated today 07:00 by mancom-agent <span class="n">1</span></span>
+                <button class="abtn">History ▾</button><button class="abtn pri">Regenerate</button>
+              </div>
+            </div>
+            <div class="sandbar"><span class="n">2</span>
+              <span class="sand">sandboxed iframe</span><span class="sand">no external network</span><span class="sand">6 allowed read endpoints</span><span class="sand">RBAC: ceo scope</span><span class="sand">artifact #88 · sha-pinned</span>
+            </div>
+            <div class="iframe-zone" style="margin-top:12px">
+              <span class="iframe-tag">AGENT-GENERATED LAYOUT · LOADED ARTIFACT</span>
+              <div class="agen"> <span class="n">3</span>
+                <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#8a8378;font-family:Inter,system-ui,sans-serif">Today the story is cement.</div>
+                <div class="big">₱182.4M billed · 1 package at risk</div>
+                <div class="cols">
+                  <div class="cell"><b>The risk</b>Pkg 5 loses ~₱9.7M of July billing if the cement gap holds. Alternate supplier canvass closes Friday.</div>
+                  <div class="cell"><b>Worth praising</b>Pkg 11 crew — 6 straight weeks ahead. Santos / Go.</div>
+                  <div class="cell"><b>Waiting on you</b>2 escalated exceptions; Pkg 7 subcon at VPO 4 days.</div>
+                </div>
+              </div>
+            </div>
+            <div class="gen" style="margin-top:10px">host contract: fetch signed artifact → render in sandbox (no scripts beyond allowlist, no external fetch) → data via read-only Pillar-3 endpoints · layout may change every run by design <span class="n">4</span></div>
+          </div>
+        </div>
+      </div>
+      <figcaption>FIG 05 · Agentic view — host shell fixed, content free. Detailed agent design is a separate session per the kickoff context.</figcaption>
+    </div>
+
+    <div class="notes">
+      <h4>Design notes</h4>
+      <ol>
+        <li><span class="n">1</span><span><b>Provenance up front:</b> which agent, when, which artifact. "Regenerate" queues an off-box run — never on the API box.</span></li>
+        <li><span class="n">2</span><span><b>The sandbox strip is the contract,</b> human-readable: iframe sandboxing, zero external network, an explicit allowlist of read-only endpoints, CEO-scoped RBAC.</span></li>
+        <li><span class="n">3</span><span><b>Inside the dashed border the agent owns the design</b> — here it chose an editorial "morning briefing" style. The mock intentionally breaks the suite's UI language to make the boundary obvious.</span></li>
+        <li><span class="n">4</span><span><b>Artifacts are versioned + sha-pinned;</b> History lets the CEO reopen yesterday's view, and a bad generation is one click backwards.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ================= 06 MOBILE ================= -->
+  <h2 class="section" data-n="06">ManCom on Mobile</h2>
+  <p class="lead">The suite is mobile-first and the President is not always at a desk. Same read-models, condensed: KPI grid, insight feed, Ask-AI dock. Read-mostly by design — deep work links back to desktop views.</p>
+
+  <div class="shot">
+    <div class="art phones" style="justify-content:flex-start">
+      <div class="phone ui">
+        <div class="scr">
+          <div class="stbar"><span>10:42</span><span>LTE ▮▮▮</span></div>
+          <div class="mtop">
+            <div class="r1"><b>ManCom</b> <span class="n">1</span><span class="ent">UBI ▾</span></div>
+            <div class="r2"><span class="toggle" style="padding:2px 8px 2px 3px;font-size:8.5px;border:0;background:#1c3954;color:#dbe7f1"><span class="tg" style="width:20px;height:12px"></span> trends fwd</span><span>live · 10:42</span></div>
+          </div>
+          <div class="mbody">
+            <div class="mk">
+              <div class="mkpi"><div class="lab">Projects</div><div class="val">104 <span class="mchip mc-bad" style="font-size:7px">6⚑</span></div><div class="sub">6 flagged</div></div>
+              <div class="mkpi"><div class="lab">Billings</div><div class="val">₱182M</div><div class="sub">▲ 12% vs May</div></div>
+              <div class="mkpi"><div class="lab">Slippage</div><div class="val" style="color:var(--warn)">−2.31%</div><div class="sub">→ −2.9% Jul (proj.)</div></div>
+              <div class="mkpi"><div class="lab">Exceptions</div><div class="val">7</div><div class="sub">2 escalated</div></div>
+            </div>
+            <div class="railh" style="margin-top:2px">AI Insights <span class="n">2</span></div>
+            <div class="mins crit"><div class="sev">● CRITICAL</div><p><b>Pkg 5 → −6.2% by July.</b> Cement late 3 wks; Item 311 gap growing.</p></div>
+            <div class="mins wrn"><div class="sev">● WARNING</div><p><b>Billing №7 blocked</b> — 2 MQC certs pending 6 days.</p></div>
+            <div class="mins pos"><div class="sev">● POSITIVE</div><p><b>Pkg 11 ahead 6 weeks</b> — advance billing?</p></div>
+            <div class="mask"><span class="n">3</span> Ask AI — what's happening? <b>➤</b></div>
+          </div>
+          <div class="mtab">
+            <span class="on"><i></i>ManCom</span><span><i></i>Insights</span><span><i></i>Ask AI</span><span><i></i>More</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes">
+      <h4>Design notes</h4>
+      <ol>
+        <li><span class="n">1</span><span><b>Same toggle, same entity switcher</b> — projection state and entity scope sync with desktop per user.</span></li>
+        <li><span class="n">2</span><span><b>Insight cards are tappable</b> → full card with evidence and actions; severity color is the left border, readable in sunlight.</span></li>
+        <li><span class="n">3</span><span><b>Ask AI is thumb-reach docked.</b> Voice input matters here — the CEO talks to it from the car between site visits.</span></li>
+        <li><span class="n">4</span><span><b>PWA offline rule applies:</b> last-fetched ManCom renders offline with a stale-data banner; never a blank screen.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ================= 07 WIDGET → READ-MODEL MAP ================= -->
+  <h2 class="section" data-n="07">Widget → Read-Model Contract</h2>
+  <p class="lead">Every widget above names its source. This table is the same information as a build checklist — the CEO module ships <b>last</b> (phase 8), but these Pillar-3 read-model shapes must be designed into each module from its first migration.</p>
+
+  <table class="map">
+    <tr><th>Widget</th><th>Source read-model</th><th>Cadence</th><th>Notes</th></tr>
+    <tr><td>KPI band</td><td><span class="rm">engineering.billing</span> <span class="rm">operations.health</span> <span class="rm">audit.exceptions</span></td><td class="cad">live / 5 min</td><td>Slippage projection computed server-side from the same trend used by charts.</td></tr>
+    <tr><td>Accomplishment vs plan</td><td><span class="rm">engineering.swa</span> <span class="rm">engineering.billing</span></td><td class="cad">weekly + on submit</td><td>Plan from financial-planning budgets; actual from weekly SWA; ₱ via pay-item rates.</td></tr>
+    <tr><td>Survey volumes</td><td><span class="rm">survey.volumes</span></td><td class="cad">monthly</td><td>The ManCom monthly volume feed named in the Survey spec.</td></tr>
+    <tr><td>Flagged projects</td><td><span class="rm">operations.health</span></td><td class="cad">live</td><td>Operations vets first (first-stop rectification) — flags arrive pre-triaged.</td></tr>
+    <tr><td>Report feed</td><td><span class="rm">*.report-status</span></td><td class="cad">live</td><td>Uniform shape every module exposes: report, due, submitted, status. Feeds the "delayed reports" insight.</td></tr>
+    <tr><td>AI Insights</td><td><span class="rm">all read-models</span> → insights agent</td><td class="cad">07:00 / 13:00 + on demand</td><td>Agent runs off-box (HCI/workstation), posts results back. Box stores and serves only.</td></tr>
+    <tr><td>Ask AI</td><td><span class="rm">pillar3.query</span></td><td class="cad">on demand</td><td>RBAC-aware query surface; clinic exposes aggregates only at the model, not the UI.</td></tr>
+    <tr><td>Agentic view</td><td><span class="rm">agent.artifacts</span> + 6 read endpoints</td><td class="cad">daily + regenerate</td><td>Signed HTML artifact, sha-pinned, rendered in sandbox. Host contract per Pillar 3.</td></tr>
+  </table>
+  <figcaption style="margin-top:8px">FIG 07 · The dashboard as data contract — if a module can't fill its row, the gap is visible before phase 8.</figcaption>
+
+  <!-- ================= 08 NEXT ================= -->
+  <h2 class="section" data-n="08">Out of Scope This Round / Next Mockups</h2>
+  <p class="lead">This set covers the CEO module only, per scope decision. Natural next rounds, in suite-phasing order:</p>
+  <div class="note" style="border-left-color:var(--accent2);background:#f0f7f8;color:#0c5e75">
+    <b>Next mockup sessions →</b> ① Field mobile set: login + offline session, PE home, AI-prefilled weekly materials schedule, DR receiving capture (branch <code>engineering_materials_weekly-schedule-ai</code>); ② Document Tracking: scan-to-transmit / receive + "where is this paper?" console (branch <code>pillar-doc-tracking</code>); ③ VPO approvals inbox (branch <code>operations</code>); ④ IT module: SNMP map, DeskGuard v2 <i>with its mandatory consent banner</i>, helpdesk Kanban, capacity forecasts (branch <code>it</code>). The agentic-view <i>content</i> design stays a separate session per the kickoff context.
+  </div>
+
+  <footer>
+    Ulticon Builders, Inc. — Construction Suite · CEO module UI mockups · Rev A<br>
+    Companion to CLAUDE.md (kickoff context) + diagrams.html (functional &amp; DFD set). Open in any browser; Print → Save as PDF for a PDF copy.
+  </footer>
+
+</div>
+</body>
+</html>

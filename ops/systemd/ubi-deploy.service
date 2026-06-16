@@ -1,0 +1,16 @@
+# Option B (polling): oneshot that runs the trigger; paired with ubi-deploy.timer.
+# install: cp ops/systemd/ubi-deploy.* /etc/systemd/system/ && systemctl enable --now ubi-deploy.timer
+[Unit]
+Description=UBI Suite — wake Server Claude to deploy if production changed
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=deploy
+WorkingDirectory=/srv/ubi
+Environment=UBI_REPO=/srv/ubi
+# Ensure `claude` and `node` are on PATH for the service user:
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/home/deploy/.local/bin
+# Run the trigger from OUTSIDE the repo so the deploy's `git reset --hard` can't
+# revert the loop guard mid-run. Copy it there in install step 0.5.
+ExecStart=/usr/bin/env bash /opt/ubi-deploy/wake-claude-deploy.sh
