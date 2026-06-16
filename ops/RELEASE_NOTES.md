@@ -4,7 +4,22 @@
 > Server Claude reads this in DEPLOY.md step 0 and honors it. Keep it current;
 > clear stale notes after they're applied.
 
-## Pending for next deploy
+## Pending for next deploy (2026-06-16 — current tip)
+
+**New this build:**
+- `helmet` is now a dependency — `npm install` will pull it (no extra config needed)
+- Two new modules auto-create their tables on boot (DB_SYNC=true):
+  `survey_measurement`, `survey_cross_section`, `mqc_test`, `mqc_pour_log`,
+  `mqc_material_cert` — no manual migration needed for demo phase
+- Seed: if `SEED_DEMO=true` and the DB already has data, the new survey + MQC seed
+  rows are added incrementally (idempotent) — no DB drop required
+- Web: new pages at `/survey` and `/mqc` — already bundled in `apps/web/dist` after build
+
+No new required env vars for this release. Standard restart flow applies.
+
+---
+
+## Previous pending notes
 - **APPLY FLEET ENV THEN RESTART (owner-authorized).** Add these to the API `.env`
   on the box (owner accepted committing them for the pilot; will rotate after):
   ```
