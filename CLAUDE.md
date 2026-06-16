@@ -55,6 +55,11 @@ printed in this repo.
 
 Micro-commits, conventional scopes per §11.
 
+> **⚠️ Before any real production launch: read `ops/PRE-PROD-AUDIT.md`** and walk
+> it. Pilot shortcuts to clear — rotate the Cartrack admin key (in git history),
+> the GitHub PAT, and the shared `Ulticon1` password; migrations; backups; etc.
+> If the owner mentions "audit before production," raise that checklist.
+
 ### Deploying (Claude-driven CD — see `ops/README.md`)
 - Dev happens on the feature branch → merged into **`kickoff-build`**.
 - **"build production"** = Cloud Claude fast-forwards the **`production`** branch
