@@ -315,6 +315,11 @@ code { font-family: var(--mono); font-size: 0.9em; letter-spacing: -0.2px; }
 .askrow input { flex: 1; border: 2px solid var(--ink); background: var(--sheet); padding: 10px 16px; box-shadow: 3px 3px 0 rgba(16, 37, 54, 0.14); }
 .askrow input:focus { outline: 2px solid var(--orange); outline-offset: 1px; }
 
+/* ── fleet live map ────────────────────────────────────────────── */
+.fleetgrid { display: grid; grid-template-columns: 1fr 340px; gap: 14px; align-items: start; }
+@media (max-width: 1000px) { .fleetgrid { grid-template-columns: 1fr; } }
+.fleetgrid .leaflet-container { border: 0; font-family: var(--disp); }
+
 /* ── department dashboard: monitoring + CCTV ───────────────────── */
 .deptgrid { display: grid; grid-template-columns: 1fr 320px; gap: 14px; align-items: start; }
 @media (max-width: 1000px) { .deptgrid { grid-template-columns: 1fr; } }

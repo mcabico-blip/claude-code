@@ -62,6 +62,7 @@ export default function Shell() {
         {item('/approvals', 'Approvals')}
         {item('/docs', 'Documents')}
         {item('/helpdesk', 'Helpdesk')}
+        {item('/fleet', 'Fleet')}
 
         <div className="sgrp">Departments</div>
         {departments.map(([slug, label]) => item(`/dept/${slug}`, label, true))}

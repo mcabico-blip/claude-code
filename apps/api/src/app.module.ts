@@ -8,6 +8,7 @@ import { CeoModule } from './modules/ceo/ceo.module';
 import { DeptModule } from './modules/dept/dept.module';
 import { EngineeringModule } from './modules/engineering/engineering.module';
 import { EquipmentModule } from './modules/equipment/equipment.module';
+import { FleetModule } from './modules/fleet/fleet.module';
 import { ItModule } from './modules/it/it.module';
 import { OperationsModule } from './modules/operations/operations.module';
 import { ProcurementModule } from './modules/procurement/procurement.module';
@@ -63,6 +64,7 @@ import { TicketingModule } from './shared/ticketing/ticketing.module';
     PropertyModule,
     RecordsModule,
     ItModule,
+    FleetModule,
     DeptModule,
     StubsModule,
     CeoModule,
