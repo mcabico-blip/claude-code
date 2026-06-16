@@ -5,11 +5,16 @@
 > clear stale notes after they're applied.
 
 ## Pending for next deploy
-- **Fleet (Cartrack) credentials** — to make the live map use real GPS, add to the
-  API `.env` on the box (NOT committed): `CARTRACK_REGION=ph`, `CARTRACK_USER=…`,
-  `CARTRACK_PASS=…` (owner supplies the values; user = Cartrack API Username,
-  pass = the 64-char API password). Without them the Fleet page serves a labeled
-  demo fleet. Restart `ubi-edge` after setting.
+- **APPLY FLEET ENV THEN RESTART (owner-authorized).** Add these to the API `.env`
+  on the box (owner accepted committing them for the pilot; will rotate after):
+  ```
+  CARTRACK_REGION=ph
+  CARTRACK_USER=ULTI00003
+  CARTRACK_PASS=eefb1f27b3417c4022e95e134328fa40f3d39b5559d454a076492974f6edf939
+  ```
+  Then `sudo systemctl restart ubi-edge`. Verify `GET /api/fleet/status` →
+  `{"configured":true,...}`. After the owner rotates the key, replace `CARTRACK_PASS`
+  here and on the box, and clear this note.
 - **Demo login chips are now hard-off in prod** (repo-authoritative). Also remove any
   leftover `VITE_SHOW_DEMO_LOGINS` / `VITE_HIDE_DEMO_LOGINS` line from the box's
   `apps/web/.env` (no longer used) and rebuild — verify the served bundle has no
