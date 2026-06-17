@@ -395,6 +395,13 @@ export class FleetService implements OnModuleInit {
       { key: 'fleet.alerts', module: 'omega', title: 'Fleet — alerts (DB)', description: 'Geofence / ignition / panic alerts, stored from 10-min poll.' },
       async () => this.alerts.find({ where: { acknowledged: false }, order: { occurredAt: 'DESC' }, take: 100 }),
     );
+    this.registry.register(
+      { key: 'fleet.fuel', module: 'omega', title: 'Fleet — fuel level summary', description: 'Current fuel % per vehicle from 10s cache; low (<20%) flagged for CEO/VPO.' },
+      async () => {
+        const live = await this.live();
+        return live.map((v) => ({ id: v.id, registration: v.registration, fuelPct: v.fuelPct, low: v.fuelPct != null && v.fuelPct < 20 }));
+      },
+    );
   }
 
   private demoFleet(): LiveVehicle[] {
@@ -501,6 +508,25 @@ export class FleetService implements OnModuleInit {
   async acknowledgeAlert(id: string): Promise<void> {
     await this.alerts.update(id, { acknowledged: true });
   }
+
+  /** Fuel level trend per vehicle — most recent 48 snapshots (one per minute stored).
+   *  Returns [{vehicleId, registration, snapshots:[{at, fuelPct}]}]. */
+  async fuelTrend(hours = 8): Promise<Array<{ vehicleId: string; registration: string; snapshots: Array<{ at: Date; fuelPct: number | null }> }>> {
+    const since = new Date(Date.now() - hours * 3_600_000);
+    const rows = await this.posLog
+      .createQueryBuilder('p')
+      .select(['p.vehicle_id', 'p.registration', 'p.fuel_pct', 'p.polled_at'])
+      .where('p.polled_at >= :since', { since })
+      .orderBy('p.vehicle_id').addOrderBy('p.polled_at', 'ASC')
+      .getRawMany() as Array<{ p_vehicle_id: string; p_registration: string; p_fuel_pct: string | null; p_polled_at: Date }>;
+
+    const byVehicle = new Map<string, { registration: string; snapshots: Array<{ at: Date; fuelPct: number | null }> }>();
+    for (const r of rows) {
+      if (!byVehicle.has(r.p_vehicle_id)) byVehicle.set(r.p_vehicle_id, { registration: r.p_registration, snapshots: [] });
+      byVehicle.get(r.p_vehicle_id)!.snapshots.push({ at: r.p_polled_at, fuelPct: r.p_fuel_pct != null ? Number(r.p_fuel_pct) : null });
+    }
+    return Array.from(byVehicle.entries()).map(([vehicleId, v]) => ({ vehicleId, ...v }));
+  }
 }
 
 // ──────────────────────────── Omega equipment service ──────────────────────
@@ -585,6 +611,13 @@ export class FleetController {
   @Claims('role:manager', 'dept:operations', 'role:ceo', 'role:vpo')
   history(@Param('id') id: string, @Query('hours') hours?: string): Promise<FleetPositionLog[]> {
     return this.fleet.positionHistory(id, Number(hours ?? 24));
+  }
+
+  /** Fuel level trend for all vehicles — from stored position snapshots. */
+  @Get('fuel/trend')
+  @Claims('role:manager', 'dept:operations', 'role:ceo', 'role:vpo')
+  fuelTrend(@Query('hours') hours?: string) {
+    return this.fleet.fuelTrend(Number(hours ?? 8));
   }
 }
 

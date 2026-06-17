@@ -119,7 +119,10 @@ export default function Fleet() {
                     eventHandlers={{ click: () => setSel(v.id) }}>
                     <Popup>
                       <b>{v.registration}</b> {v.name ? `· ${v.name}` : ''}<br />
-                      {v.ignition && (v.speed ?? 0) > 0 ? 'moving' : 'stopped'} · {v.speed ?? 0} km/h · {v.odometerKm?.toLocaleString() ?? '—'} km<br />
+                      {v.ignition && (v.speed ?? 0) > 0 ? '🟢 moving' : '🔴 stopped'} · {v.speed ?? 0} km/h<br />
+                      Odometer: {v.odometerKm?.toLocaleString() ?? '—'} km<br />
+                      Fuel: {v.fuelPct != null ? `${v.fuelPct.toFixed(1)}%` : '—'}{v.fuelPct != null && v.fuelPct < 20 ? ' ⚠️ LOW' : ''}<br />
+                      {v.driver ? <>{v.driver}<br /></> : null}
                       {v.address ?? `${v.lat!.toFixed(4)}, ${v.lng!.toFixed(4)}`}<br />
                       <span style={{ color: '#5b6b7a' }}>{v.at ? new Date(v.at).toLocaleString() : ''}</span>
                     </Popup>
@@ -131,16 +134,24 @@ export default function Fleet() {
               <div className="ph"><b>Vehicles</b><span className="src">SRC · fleet.live</span></div>
               <div style={{ maxHeight: 440, overflowY: 'auto' }}>
                 <table className="tbl">
-                  <thead><tr><th>Reg</th><th>Status</th><th>km/h</th><th /></tr></thead>
+                  <thead><tr><th>Reg</th><th>Status</th><th>km/h</th><th>Fuel</th><th /></tr></thead>
                   <tbody>
-                    {(vehicles ?? []).map((v) => (
-                      <tr key={v.id} onClick={() => setSel(v.id)} style={{ cursor: 'pointer', background: sel === v.id ? 'rgba(194,65,12,0.06)' : undefined }}>
-                        <td><b>{v.registration}</b><div className="muted" style={{ fontSize: 10 }}>{(v.address ?? '').slice(0, 28)}</div></td>
-                        <td><span className={`st ${v.ignition && (v.speed ?? 0) > 0 ? 'st-ok' : 'st-warn'}`}>{v.ignition && (v.speed ?? 0) > 0 ? 'moving' : 'stopped'}</span></td>
-                        <td>{v.speed ?? 0}</td>
-                        <td><button className="btn sm" onClick={(e) => { e.stopPropagation(); void locate(v.id); }} title="request a fresh GPS fix">locate</button></td>
-                      </tr>
-                    ))}
+                    {(vehicles ?? []).map((v) => {
+                      const lowFuel = v.fuelPct != null && v.fuelPct < 20;
+                      return (
+                        <tr key={v.id} onClick={() => setSel(v.id)} style={{ cursor: 'pointer', background: sel === v.id ? 'rgba(194,65,12,0.06)' : undefined }}>
+                          <td><b>{v.registration}</b><div className="muted" style={{ fontSize: 10 }}>{(v.address ?? '').slice(0, 30)}</div></td>
+                          <td><span className={`st ${v.ignition && (v.speed ?? 0) > 0 ? 'st-ok' : 'st-warn'}`}>{v.ignition && (v.speed ?? 0) > 0 ? 'moving' : 'stopped'}</span></td>
+                          <td>{v.speed ?? 0}</td>
+                          <td>
+                            {v.fuelPct != null
+                              ? <span className={`st ${lowFuel ? 'st-bad' : v.fuelPct < 40 ? 'st-warn' : 'st-ok'}`}>{v.fuelPct.toFixed(0)}%</span>
+                              : <span className="muted">—</span>}
+                          </td>
+                          <td><button className="btn sm" onClick={(e) => { e.stopPropagation(); void locate(v.id); }} title="request a fresh GPS fix">locate</button></td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
