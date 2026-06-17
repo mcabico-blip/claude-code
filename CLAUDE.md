@@ -64,13 +64,17 @@ Micro-commits, conventional scopes per §11.
 > If the owner mentions "audit before production," raise that checklist.
 
 ### Deploying (Claude-driven CD — see `ops/README.md`)
-- Dev happens on the feature branch → merged into **`kickoff-build`**.
-- **"build production"** = Cloud Claude fast-forwards the **`production`** branch
-  to the reviewed `kickoff-build` tip and pushes it (noting any env/migration
-  steps in `ops/RELEASE_NOTES.md`).
-- A trigger on the box (1-min systemd timer and/or GitHub webhook) wakes
-  **Server Claude** (`claude -p` reading `ops/DEPLOY.md`) which deploys, **fixes
-  issues or rolls back**, and pushes `ops/DEPLOY_STATUS.md` back.
+- Dev happens on the feature branch (e.g. `claude/magical-darwin-dulx3f`) → push
+  to that branch → **to deploy: push the same commit to `production`**.
+- **`production` branch IS the deploy signal.** Server Claude on the box
+  (`edge.ubi-as.com`) polls `production` via a 1-min systemd timer
+  (`ubi-deploy.timer`) **and** a GitHub push webhook (`/ubi-deploy-hook`).
+  Either triggers `ops/wake-claude-deploy.sh` → headless `claude -p` →
+  reads `ops/DEPLOY.md` → `git pull` → `npm install` → `npm run build` →
+  `systemctl restart ubi-edge` → health check → pushes `ops/DEPLOY_STATUS.md`.
+- **"build production"** = Cloud Claude fast-forwards `production` to the current
+  feature branch tip: `git push origin HEAD:production` (note any env/migration
+  steps in `ops/RELEASE_NOTES.md` first).
 - At session start, Cloud Claude should read `ops/DEPLOY_STATUS.md` and act on
   its `for_cloud_claude:` line.
 
