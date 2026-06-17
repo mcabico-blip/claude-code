@@ -11,10 +11,11 @@ interface LiveVehicle {
   address: string | null; at: string | null; demo?: boolean;
 }
 type Row = Record<string, unknown>;
-type Tab = 'live' | 'trips' | 'events' | 'alerts' | 'geofences' | 'maintenance';
+type Tab = 'live' | 'equipment' | 'trips' | 'events' | 'alerts' | 'geofences' | 'maintenance';
 
 const TABS: { key: Tab; label: string }[] = [
   { key: 'live', label: 'Live map' },
+  { key: 'equipment', label: 'Equipment' },
   { key: 'trips', label: 'Trips' },
   { key: 'events', label: 'Driver events' },
   { key: 'alerts', label: 'Alerts' },
@@ -22,9 +23,10 @@ const TABS: { key: Tab; label: string }[] = [
   { key: 'maintenance', label: 'Maintenance' },
 ];
 const COLS: Partial<Record<Tab, string[]>> = {
+  equipment: ['unitNo', 'plate', 'equipmentType', 'make', 'model', 'year', 'status', 'assignedProject'],
   trips: ['registration', 'start_timestamp', 'end_timestamp', 'trip_distance', 'trip_duration', 'start_location', 'end_location'],
-  events: ['registration', 'event_description', 'event_type', 'event_ts', 'speed', 'position_description'],
-  alerts: ['registration', 'name', 'trigger_description', 'notification_msg', 'event_ts', 'speed'],
+  events: ['registration', 'eventType', 'eventDescription', 'occurredAt', 'speedKmh', 'address'],
+  alerts: ['registration', 'alertType', 'message', 'occurredAt', 'acknowledged'],
   geofences: ['name', 'description', 'position_description', 'colour'],
   maintenance: ['registration', 'name', 'model', 'under_maintenance', 'licence_expiry'],
 };
@@ -67,14 +69,19 @@ export default function Fleet() {
   useEffect(() => {
     api<{ configured: boolean; region: string }>('/fleet/status').then(setCfg).catch(() => {});
     void loadLive();
-    timer.current = window.setInterval(loadLive, 20000);
+    // Server caches at 10s — client polls at 5s for near-real-time feel.
+    timer.current = window.setInterval(loadLive, 5000);
     return () => window.clearInterval(timer.current);
   }, []);
 
   useEffect(() => {
     if (tab === 'live') return;
     setData(null);
-    api<Row[]>(`/fleet/${tab === 'alerts' ? 'notifications' : tab}`).then(setData).catch((e: Error) => setError(e.message));
+    const path =
+      tab === 'alerts' ? '/fleet/notifications' :
+      tab === 'equipment' ? '/omega/equipment' :
+      `/fleet/${tab}`;
+    api<Row[]>(path).then(setData).catch((e: Error) => setError(e.message));
   }, [tab]);
 
   const located = useMemo(() => (vehicles ?? []).filter((v) => v.lat != null && v.lng != null), [vehicles]);
@@ -90,7 +97,7 @@ export default function Fleet() {
 
   return (
     <>
-      <SheetBar sheet="FLT-01" title="Fleet — Cartrack live management" note={cfg?.configured ? `LIVE · region ${cfg.region} · ${vehicles?.length ?? 0} vehicles` : 'DEMO — set CARTRACK_USER/PASS for live GPS'} />
+      <SheetBar sheet="OAE-FLT" title="Omega Asia — Fleet &amp; Equipment" note={cfg?.configured ? `LIVE · Cartrack ${cfg.region} · ${vehicles?.length ?? 0} vehicles · 10s server cache` : 'DEMO — set CARTRACK_USER/PASS for live GPS'} />
       {cfg && !cfg.configured && (
         <div className="hint" style={{ marginTop: 0 }}>Demo fleet shown. Set <code>CARTRACK_USER</code>/<code>CARTRACK_PASS</code> (region <code>{cfg.region}</code>) for live GPS.</div>
       )}
@@ -137,7 +144,7 @@ export default function Fleet() {
                   </tbody>
                 </table>
               </div>
-              <div className="muted" style={{ fontSize: 10, marginTop: 6 }}>Auto-refresh 20s · {located.length}/{vehicles.length} located</div>
+              <div className="muted" style={{ fontSize: 10, marginTop: 6 }}>Client refresh 5s · server cache 10s · {located.length}/{vehicles.length} located</div>
             </div>
           </div>
         )

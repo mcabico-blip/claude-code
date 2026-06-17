@@ -14,6 +14,7 @@ import { PayItemEntity, ProjectEntity } from '../modules/engineering/entities';
 import { EquipmentModule, EquipmentService } from '../modules/equipment/equipment.module';
 import { ItModule, ItService } from '../modules/it/it.module';
 import { MqcModule, MqcService } from '../modules/mqc/mqc.module';
+import { OmegaModule, OmegaService } from '../modules/omega/omega.module';
 import { PropertyModule, PropertyService } from '../modules/property/property.module';
 import { QuantityModule, QuantityService } from '../modules/quantity/quantity.module';
 import { RecordsModule, RecordsService } from '../modules/records/records.module';
@@ -37,6 +38,7 @@ export class SeedService implements OnApplicationBootstrap {
     private readonly equipment: EquipmentService,
     private readonly survey: SurveyService,
     private readonly mqc: MqcService,
+    private readonly omega: OmegaService,
     @InjectRepository(PayItemEntity) private readonly payItems: Repository<PayItemEntity>,
     @InjectRepository(ProjectEntity) private readonly projects: Repository<ProjectEntity>,
     @InjectRepository(InsightEntity) private readonly insights: Repository<InsightEntity>,
@@ -156,6 +158,7 @@ export class SeedService implements OnApplicationBootstrap {
 
     await this.seedSurvey();
     await this.seedMqc();
+    await this.omega.seed('seed');
 
     this.log.log('seed complete — ceo@ubi.ph/ceo123, admin/vpo/pm/pe, + dept heads head-<dept>@ubi.ph/head123');
   }
@@ -210,7 +213,7 @@ export class SeedService implements OnApplicationBootstrap {
 }
 
 @Module({
-  imports: [DocTrackingModule, EngineeringModule, PropertyModule, RecordsModule, ItModule, QuantityModule, EquipmentModule, SurveyModule, MqcModule],
+  imports: [DocTrackingModule, EngineeringModule, PropertyModule, RecordsModule, ItModule, QuantityModule, EquipmentModule, SurveyModule, MqcModule, OmegaModule],
   providers: [SeedService],
 })
 export class SeedModule {}

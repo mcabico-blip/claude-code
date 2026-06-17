@@ -62,7 +62,7 @@ export default function Shell() {
         {item('/approvals', 'Approvals')}
         {item('/docs', 'Documents')}
         {item('/helpdesk', 'Helpdesk')}
-        {item('/fleet', 'Fleet')}
+        {item('/fleet', 'Omega / Fleet')}
 
         <div className="sgrp">Tools</div>
         {item('/survey', 'Survey tools')}
