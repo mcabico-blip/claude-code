@@ -1,0 +1,23 @@
+# Option A (event-driven): keeps the webhook receiver running. GitHub push to
+# `production` → instant deploy. Add a GitHub webhook: Payload URL
+# https://edge.ubi-as.com/ubi-deploy-hook, content-type application/json,
+# secret = $GH_WEBHOOK_SECRET, event = "push" only.
+[Unit]
+Description=UBI Suite — GitHub deploy webhook receiver
+After=network-online.target
+
+[Service]
+User=deploy
+WorkingDirectory=/srv/ubi
+Environment=UBI_REPO=/srv/ubi
+Environment=PORT=8787
+# Put the secret in /etc/ubi-webhook.env (chmod 600), not here:
+EnvironmentFile=/etc/ubi-webhook.env
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/home/deploy/.local/bin
+# Run from OUTSIDE the repo (survives the deploy's `git reset --hard`).
+ExecStart=/usr/bin/node /opt/ubi-deploy/webhook-receiver.mjs
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

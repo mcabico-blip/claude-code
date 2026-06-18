@@ -1,0 +1,12 @@
+# Polls every 1 minute (cheap: just a git ls-remote unless the SHA changed).
+[Unit]
+Description=UBI Suite — check production branch for deploys
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=15s
+Unit=ubi-deploy.service
+
+[Install]
+WantedBy=timers.target

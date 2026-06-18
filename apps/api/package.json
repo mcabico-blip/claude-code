@@ -1,0 +1,40 @@
+{
+  "name": "@ubi/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "migration:generate": "typeorm-ts-node-commonjs -d src/data-source.ts migration:generate src/migrations/Migration",
+    "migration:run": "typeorm-ts-node-commonjs -d src/data-source.ts migration:run",
+    "migration:revert": "typeorm-ts-node-commonjs -d src/data-source.ts migration:revert"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/platform-express": "^11.0.0",
+    "@nestjs/typeorm": "^11.0.0",
+    "@ubi/storage": "*",
+    "@ubi/types": "*",
+    "bcryptjs": "^2.4.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.0",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}
