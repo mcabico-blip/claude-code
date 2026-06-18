@@ -8,12 +8,34 @@
 
 ---
 
-## 0. CURRENT BUILD STATE — START HERE (updated 2026-06-16)
+## 0. CURRENT BUILD STATE — START HERE (updated 2026-06-18)
 
-> **For Claude Code sessions:** the suite is **no longer pre-code**. A working
-> breadth-first build lives on PR #1 → `main` (branch `claude/magical-darwin-dulx3f`
-> or `claude/gifted-heisenberg-inxyvn` — both are the same tip).
-> A deployment is live at `edge.ubi-as.com`.
+> **For Claude Code sessions:** the suite is **no longer pre-code**. Working
+> code is on branch `claude/magical-darwin-dulx3f` (same tip as `production`).
+> Live at `edge.ubi-as.com`. **Do not rebuild anything — continue from here.**
+
+### Deploy state (read this first)
+- **Feature branch tip:** `d56c42e` (docs: clarify CD chain)
+- **Production branch tip:** `d56c42e` — same, all code is pushed.
+- **Last confirmed box deploy:** `ae7aff5` (Cartrack env apply). Commits
+  `c2f83f2` → `d56c42e` (Survey, MQC, Omega module, fuel level) are on
+  `production` branch but **may still be building** — the owner ran
+  `bash ops/wake-claude-deploy.sh --force` just before this handoff.
+- **Verify at session start:** `curl -s https://edge.ubi-as.com/api/health`
+  then check `git show origin/production:ops/DEPLOY_STATUS.md`. If result
+  is still `NOT-YET-DEPLOYED` or `deployed_sha` < `d56c42e`, the 1-min
+  timer will pick it up automatically — just wait or run `--force` again.
+- **Login works:** confirmed `POST /api/auth/login` → 200. Credentials:
+  `ceo@ubi.ph` / `Ulticon1` (demo). Browser DNS issue noted (see below).
+- **CD chain:** `ubi-deploy.timer` is active on the box (running since
+  2026-06-15). GitHub webhook receiver is also up (`/ubi-deploy-hook` → 405).
+  GitHub-side webhook is NOT yet registered — timer alone covers deploys
+  (1-min lag). To push a deploy: `git push origin HEAD:production`.
+
+### Known issue — client DNS (ERR_NAME_NOT_RESOLVED)
+The owner's browser gets `ERR_NAME_NOT_RESOLVED` for `edge.ubi-as.com`.
+Server-side DNS resolves fine (IP `13.229.193.27`). Fix on client:
+`ipconfig /flushdns` or set DNS to `8.8.8.8`. This is NOT a code issue.
 
 **What exists and runs**
 - Monorepo: `apps/api` (NestJS + Helmet), `apps/web` (React+Vite PWA),
@@ -31,10 +53,12 @@
   cross-sections + station/chainage), **MQC** (DPWH test rules, QC tests, pour
   logs, material certs), Property (QR EAM), Records (vehicle doc registry,
   physical-location index), IT (SNMP device list, PMS scheduler, DeskGuard
-  consent, env monitoring), Fleet (Cartrack GPS/trips/events).
+  consent, env monitoring), **Omega/Fleet** (Cartrack server-side poller 10s,
+  analytics DB snapshots, equipment register, fuel level + low-fuel alerts,
+  `/fleet/*` + `/omega/equipment` routes).
 - **Web:** "drawing comes alive" design system. Pages: login, ManCom, AI
   Insights, Ask AI, Documents, Approvals, Engineering, Quantity, Equipment,
-  Survey, MQC, Property, Records, IT (+ PMS), Fleet, per-department read surfaces.
+  Survey, MQC, Property, Records, IT (+ PMS), Omega/Fleet (live map + tabs).
 
 **Run locally** — see README. Short: `cp .env.example .env` → Postgres+Redis
 up → `npm install` → `npm run dev:api` (:3000; seeds demo data only when
@@ -47,14 +71,18 @@ migrations (`npm run migration:generate` then `migration:run`) and set
 `DB_SYNC=false`. See `ops/PRE-PROD-AUDIT.md`.
 
 **Next work, in order**
-1. **Postgres + uploads backup script** — cron/systemd + `pg_dump` + rsync.
-2. **Engineering SWA + billing** — real `weekly_swa` and `billing_batch`
+1. **Verify Omega deploy** — confirm `/api/omega/equipment` and `/api/fleet/live`
+   are live on the box after the in-progress deploy completes.
+2. **Register GitHub webhook** — `ops/INSTALL-AUTOMATION.md` step 2 on the box
+   so future `production` pushes deploy instantly (not just via 1-min timer).
+3. **Postgres + uploads backup script** — cron/systemd + `pg_dump` + rsync.
+4. **Engineering SWA + billing** — real `weekly_swa` and `billing_batch`
    tables; SWA feeds ManCom volumes.
-3. **Audit module** — findings register + exception tracker feeds AI Insights.
-4. **IT SNMP live polling** — actual SNMP worker + topology map.
-5. **Field photo pipeline** — client-side compress + GPS/timestamp + offline
+5. **Audit module** — findings register + exception tracker feeds AI Insights.
+6. **IT SNMP live polling** — actual SNMP worker + topology map.
+7. **Field photo pipeline** — client-side compress + GPS/timestamp + offline
    queue service worker.
-6. **Google OAuth** — layer on top of standalone auth.
+8. **Google OAuth** — layer on top of standalone auth.
 
 Micro-commits, conventional scopes per §11.
 
